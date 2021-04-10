@@ -1,0 +1,5 @@
+0 Cat
+1 Dog
+2 Hamster
+3 Canary
+4 Turtle

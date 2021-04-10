@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "473208879336",
+    "firebase_url": "https://petapp-989a3-default-rtdb.firebaseio.com",
+    "project_id": "petapp-989a3",
+    "storage_bucket": "petapp-989a3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473208879336:android:b023d5a1284772b7f5715d",
+        "android_client_info": {
+          "package_name": "com.example.e_commerce_app_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "473208879336-b57h30kvcemesqu5uhp59ifed31nee0j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTw45fsD3f3Evfad0zkHQ525ZRhJFwWG0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "473208879336-b57h30kvcemesqu5uhp59ifed31nee0j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
