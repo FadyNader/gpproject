@@ -10,6 +10,7 @@ import 'package:e_commerce_app_flutter/services/database/product_database_helper
 import 'package:e_commerce_app_flutter/services/firestore_files_access/firestore_files_access_service.dart';
 import 'package:e_commerce_app_flutter/services/local_files_access/local_files_access_service.dart';
 import 'package:enum_to_string/enum_to_string.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tags/flutter_tags.dart';
 import 'package:future_progress_dialog/future_progress_dialog.dart';
@@ -37,17 +38,12 @@ class _EditProductFormState extends State<EditProductForm> {
   final _describeProductFormKey = GlobalKey<FormState>();
   final _tagStateKey = GlobalKey<TagsState>();
 
-  final TextEditingController titleFieldController = TextEditingController();
+  final TextEditingController nameFieldController = TextEditingController();
   final TextEditingController variantFieldController = TextEditingController();
-  final TextEditingController discountPriceFieldController =
-      TextEditingController();
-  final TextEditingController originalPriceFieldController =
-      TextEditingController();
-  final TextEditingController highlightsFieldController =
-      TextEditingController();
-  final TextEditingController descriptionFieldController =
-      TextEditingController();
-  final TextEditingController sellerFieldController = TextEditingController();
+  final TextEditingController weightFieldController = TextEditingController();
+  final TextEditingController ageFieldController = TextEditingController();
+  final TextEditingController highlightsFieldController = TextEditingController();
+  final TextEditingController descriptionFieldController = TextEditingController();
 
   bool newProduct = true;
   Product product;
@@ -57,13 +53,12 @@ class _EditProductFormState extends State<EditProductForm> {
 
   @override
   void dispose() {
-    titleFieldController.dispose();
+    nameFieldController.dispose();
     variantFieldController.dispose();
-    discountPriceFieldController.dispose();
-    originalPriceFieldController.dispose();
+    weightFieldController.dispose();
+    ageFieldController.dispose();
     highlightsFieldController.dispose();
     descriptionFieldController.dispose();
-    sellerFieldController.dispose();
     Tflite.close();
     super.dispose();
   }
@@ -77,11 +72,9 @@ class _EditProductFormState extends State<EditProductForm> {
     } else {
       product = widget.product;
       newProduct = false;
-      final productDetails =
-          Provider.of<ProductDetails>(context, listen: false);
-      productDetails.initialSelectedImages = widget.product.images
-          .map((e) => CustomImage(imgType: ImageType.network, path: e))
-          .toList();
+      final productDetails = Provider.of<ProductDetails>(context, listen: false);
+      productDetails.initialSelectedImages =
+          widget.product.images.map((e) => CustomImage(imgType: ImageType.network, path: e)).toList();
       productDetails.initialProductType = product.productType;
       productDetails.initSearchTags = product.searchTags ?? [];
     }
@@ -118,13 +111,12 @@ class _EditProductFormState extends State<EditProductForm> {
       ],
     );
     if (newProduct == false) {
-      titleFieldController.text = product.title;
+      nameFieldController.text = product.name;
       variantFieldController.text = product.variant;
-      discountPriceFieldController.text = product.discountPrice.toString();
-      originalPriceFieldController.text = product.originalPrice.toString();
+      weightFieldController.text = product.weight.toString();
+      ageFieldController.text = product.age.toString();
       highlightsFieldController.text = product.highlights;
       descriptionFieldController.text = product.description;
-      sellerFieldController.text = product.seller;
     }
     return column;
   }
@@ -186,18 +178,17 @@ class _EditProductFormState extends State<EditProductForm> {
         leading: Icon(
           Icons.shop,
         ),
-        childrenPadding:
-            EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
+        childrenPadding: EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
         children: [
-          buildTitleField(),
+          buildNameField(),
           SizedBox(height: getProportionateScreenHeight(20)),
           buildVariantField(),
           SizedBox(height: getProportionateScreenHeight(20)),
-          buildOriginalPriceField(),
+          buildWeightField(),
           SizedBox(height: getProportionateScreenHeight(20)),
-          buildDiscountPriceField(),
+          buildAgeField(),
           SizedBox(height: getProportionateScreenHeight(20)),
-          buildSellerField(),
+          buildPetTypeDropdown(),
           SizedBox(height: getProportionateScreenHeight(20)),
         ],
       ),
@@ -207,11 +198,11 @@ class _EditProductFormState extends State<EditProductForm> {
   bool validateBasicDetailsForm() {
     if (_basicDetailsFormKey.currentState.validate()) {
       _basicDetailsFormKey.currentState.save();
-      product.title = titleFieldController.text;
+      product.name = nameFieldController.text;
       product.variant = variantFieldController.text;
-      product.originalPrice = double.parse(originalPriceFieldController.text);
-      product.discountPrice = double.parse(discountPriceFieldController.text);
-      product.seller = sellerFieldController.text;
+      product.weight = double.tryParse(weightFieldController.text);
+      product.age = int.tryParse(ageFieldController.text);
+      product.seller = FirebaseAuth.instance.currentUser.displayName;
       return true;
     }
     return false;
@@ -229,8 +220,7 @@ class _EditProductFormState extends State<EditProductForm> {
         leading: Icon(
           Icons.description,
         ),
-        childrenPadding:
-            EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
+        childrenPadding: EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
         children: [
           buildHighlightsField(),
           SizedBox(height: getProportionateScreenHeight(20)),
@@ -293,6 +283,48 @@ class _EditProductFormState extends State<EditProductForm> {
     );
   }
 
+  Widget buildPetTypeDropdown() {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 6,
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(color: kTextColor, width: 1),
+        borderRadius: BorderRadius.all(Radius.circular(28)),
+      ),
+      child: Consumer<ProductDetails>(
+        builder: (context, productDetails, child) {
+          return DropdownButton(
+            value: productDetails.sexType,
+            items: SexType.values
+                .map(
+                  (e) => DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      EnumToString.convertToString(e),
+                    ),
+                  ),
+                )
+                .toList(),
+            hint: Text(
+              "Choose Sex Type",
+            ),
+            style: TextStyle(
+              color: kTextColor,
+              fontSize: 16,
+            ),
+            onChanged: (value) {
+              productDetails.sexType = value;
+            },
+            elevation: 0,
+            underline: SizedBox(width: 0, height: 0),
+          );
+        },
+      ),
+    );
+  }
+
   Widget buildProductSearchTagsTile() {
     return ExpansionTile(
       title: Text(
@@ -300,8 +332,7 @@ class _EditProductFormState extends State<EditProductForm> {
         style: Theme.of(context).textTheme.headline6,
       ),
       leading: Icon(Icons.check_circle_sharp),
-      childrenPadding:
-          EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
+      childrenPadding: EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
       children: [
         Text("Your pet info will be searched for this Tags"),
         SizedBox(height: getProportionateScreenHeight(15)),
@@ -317,8 +348,7 @@ class _EditProductFormState extends State<EditProductForm> {
         style: Theme.of(context).textTheme.headline6,
       ),
       leading: Icon(Icons.image),
-      childrenPadding:
-          EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
+      childrenPadding: EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -347,13 +377,9 @@ class _EditProductFormState extends State<EditProductForm> {
                         onTap: () {
                           addImageButtonCallback(index: index);
                         },
-                        child: productDetails.selectedImages[index].imgType ==
-                                ImageType.local
-                            ? Image.memory(
-                                File(productDetails.selectedImages[index].path)
-                                    .readAsBytesSync())
-                            : Image.network(
-                                productDetails.selectedImages[index].path),
+                        child: productDetails.selectedImages[index].imgType == ImageType.local
+                            ? Image.memory(File(productDetails.selectedImages[index].path).readAsBytesSync())
+                            : Image.network(productDetails.selectedImages[index].path),
                       ),
                     ),
                   ),
@@ -366,17 +392,17 @@ class _EditProductFormState extends State<EditProductForm> {
     );
   }
 
-  Widget buildTitleField() {
+  Widget buildNameField() {
     return TextFormField(
-      controller: titleFieldController,
+      controller: nameFieldController,
       keyboardType: TextInputType.name,
       decoration: InputDecoration(
-        hintText: "e.g.,  Dog",
-        labelText: "Pet Title",
+        hintText: "e.g.,  Ray",
+        labelText: "Pet Name",
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
       validator: (_) {
-        if (titleFieldController.text.isEmpty) {
+        if (nameFieldController.text.isEmpty) {
           return FIELD_REQUIRED_MSG;
         }
         return null;
@@ -404,13 +430,50 @@ class _EditProductFormState extends State<EditProductForm> {
     );
   }
 
+  Widget buildWeightField() {
+    return TextFormField(
+      controller: weightFieldController,
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      decoration: InputDecoration(
+        hintText: "e.g.,  15",
+        labelText: "Pet Weight",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
+      validator: (_) {
+        if (weightFieldController.text.isEmpty) {
+          return FIELD_REQUIRED_MSG;
+        }
+        return null;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget buildAgeField() {
+    return TextFormField(
+      controller: ageFieldController,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        hintText: "e.g.,  3",
+        labelText: "Pet Age in Months",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
+      validator: (_) {
+        if (ageFieldController.text.isEmpty) {
+          return FIELD_REQUIRED_MSG;
+        }
+        return null;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
   Widget buildHighlightsField() {
     return TextFormField(
       controller: highlightsFieldController,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
-        hintText:
-            "e.g., more description",
+        hintText: "e.g., more description",
         labelText: "Highlights",
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
@@ -430,8 +493,7 @@ class _EditProductFormState extends State<EditProductForm> {
       controller: descriptionFieldController,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
-        hintText:
-            "e.g., This a cat or dog",
+        hintText: "e.g., This a cat or dog",
         labelText: "Description",
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
@@ -443,63 +505,6 @@ class _EditProductFormState extends State<EditProductForm> {
       },
       autovalidateMode: AutovalidateMode.onUserInteraction,
       maxLines: null,
-    );
-  }
-
-  Widget buildSellerField() {
-    return TextFormField(
-      controller: sellerFieldController,
-      keyboardType: TextInputType.name,
-      decoration: InputDecoration(
-        hintText: "e.g., price",
-        labelText: "Seller",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-      ),
-      validator: (_) {
-        if (sellerFieldController.text.isEmpty) {
-          return FIELD_REQUIRED_MSG;
-        }
-        return null;
-      },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-    );
-  }
-
-  Widget buildOriginalPriceField() {
-    return TextFormField(
-      controller: originalPriceFieldController,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        hintText: "e.g., 597.0",
-        labelText: "Original Price ",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-      ),
-      validator: (_) {
-        if (originalPriceFieldController.text.isEmpty) {
-          return FIELD_REQUIRED_MSG;
-        }
-        return null;
-      },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-    );
-  }
-
-  Widget buildDiscountPriceField() {
-    return TextFormField(
-      controller: discountPriceFieldController,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        hintText: "e.g., 247.0",
-        labelText: "new price ",
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-      ),
-      validator: (_) {
-        if (discountPriceFieldController.text.isEmpty) {
-          return FIELD_REQUIRED_MSG;
-        }
-        return null;
-      },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
     );
   }
 
@@ -549,10 +554,10 @@ class _EditProductFormState extends State<EditProductForm> {
     String snackbarMessage;
     try {
       product.productType = productDetails.productType;
+      product.sexType = productDetails.sexType;
       product.searchTags = productDetails.searchTags;
-      final productUploadFuture = newProduct
-          ? ProductDatabaseHelper().addUsersProduct(product)
-          : ProductDatabaseHelper().updateUsersProduct(product);
+      final productUploadFuture =
+          newProduct ? ProductDatabaseHelper().addUsersProduct(product) : ProductDatabaseHelper().updateUsersProduct(product);
       productUploadFuture.then((value) {
         productId = value;
       });
@@ -561,8 +566,7 @@ class _EditProductFormState extends State<EditProductForm> {
         builder: (context) {
           return FutureProgressDialog(
             productUploadFuture,
-            message:
-                Text(newProduct ? "Uploading Pet" : "Updating Pet"),
+            message: Text(newProduct ? "Uploading Pet" : "Updating Pet"),
           );
         },
       );
@@ -608,13 +612,10 @@ class _EditProductFormState extends State<EditProductForm> {
         ),
       );
     }
-    List<String> downloadUrls = productDetails.selectedImages
-        .map((e) => e.imgType == ImageType.network ? e.path : null)
-        .toList();
+    List<String> downloadUrls = productDetails.selectedImages.map((e) => e.imgType == ImageType.network ? e.path : null).toList();
     bool productFinalizeUpdate = false;
     try {
-      final updateProductFuture =
-          ProductDatabaseHelper().updateProductsImages(productId, downloadUrls);
+      final updateProductFuture = ProductDatabaseHelper().updateProductsImages(productId, downloadUrls);
       productFinalizeUpdate = await showDialog(
         context: context,
         builder: (context) {
@@ -655,15 +656,13 @@ class _EditProductFormState extends State<EditProductForm> {
         String downloadUrl;
         try {
           final imgUploadFuture = FirestoreFilesAccess().uploadFileToPath(
-              File(productDetails.selectedImages[i].path),
-              ProductDatabaseHelper().getPathForProductImage(productId, i));
+              File(productDetails.selectedImages[i].path), ProductDatabaseHelper().getPathForProductImage(productId, i));
           downloadUrl = await showDialog(
             context: context,
             builder: (context) {
               return FutureProgressDialog(
                 imgUploadFuture,
-                message: Text(
-                    "Uploading Images ${i + 1}/${productDetails.selectedImages.length}"),
+                message: Text("Uploading Images ${i + 1}/${productDetails.selectedImages.length}"),
               );
             },
           );
@@ -673,14 +672,12 @@ class _EditProductFormState extends State<EditProductForm> {
           Logger().w("Firebase Exception: $e");
         } finally {
           if (downloadUrl != null) {
-            productDetails.selectedImages[i] =
-                CustomImage(imgType: ImageType.network, path: downloadUrl);
+            productDetails.selectedImages[i] = CustomImage(imgType: ImageType.network, path: downloadUrl);
           } else {
             allImagesUpdated = false;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content:
-                    Text("Couldn't upload image ${i + 1} due to some issue"),
+                content: Text("Couldn't upload image ${i + 1} due to some issue"),
               ),
             );
           }
@@ -693,8 +690,7 @@ class _EditProductFormState extends State<EditProductForm> {
   Future<void> addImageButtonCallback({int index}) async {
     final productDetails = Provider.of<ProductDetails>(context, listen: false);
     if (index == null && productDetails.selectedImages.length >= 3) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Max 3 images can be uploaded")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Max 3 images can be uploaded")));
       return;
     }
     String path;
@@ -724,11 +720,9 @@ class _EditProductFormState extends State<EditProductForm> {
       return;
     }
     if (index == null) {
-      productDetails.addNewSelectedImage(
-          CustomImage(imgType: ImageType.local, path: path));
+      productDetails.addNewSelectedImage(CustomImage(imgType: ImageType.local, path: path));
     } else {
-      productDetails.setSelectedImageAtIndex(
-          CustomImage(imgType: ImageType.local, path: path), index);
+      productDetails.setSelectedImageAtIndex(CustomImage(imgType: ImageType.local, path: path), index);
     }
   }
 
@@ -739,8 +733,7 @@ class _EditProductFormState extends State<EditProductForm> {
         style: Theme.of(context).textTheme.headline6,
       ),
       leading: Icon(Icons.image),
-      childrenPadding:
-      EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
+      childrenPadding: EdgeInsets.symmetric(vertical: getProportionateScreenHeight(20)),
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -755,31 +748,34 @@ class _EditProductFormState extends State<EditProductForm> {
         ),
         _loading
             ? Container(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(),
-        ) :Container(
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            children: [
-              _image == null ? Container() : Image.file(_image),
-              SizedBox(
-                height: 20,
-              ),
-              _outputs != null ? Text(
-                " result : ${_outputs[0]['label'].substring(2)} \n accuracy : ${(_outputs[0]['confidence'] * 100).toStringAsFixed(1)} %",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20.0,
-                  background: Paint()..color = Colors.white,
+                alignment: Alignment.center,
+                child: CircularProgressIndicator(),
+              )
+            : Container(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    _image == null ? Container() : Image.file(_image),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    _outputs != null
+                        ? Text(
+                            " result : ${_outputs[0]['label'].substring(2)} \n accuracy : ${(_outputs[0]['confidence'] * 100).toStringAsFixed(1)} %",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20.0,
+                              background: Paint()..color = Colors.white,
+                            ),
+                          )
+                        : Container()
+                  ],
                 ),
-              ) : Container()
-
-            ],
-          ),
-        ),
+              ),
       ],
     );
   }
+
   pickImage() async {
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
     if (image == null) return null;

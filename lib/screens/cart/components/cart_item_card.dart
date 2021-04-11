@@ -4,7 +4,6 @@ import 'package:e_commerce_app_flutter/services/database/product_database_helper
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
-import '../../../constants.dart';
 import '../../../size_config.dart';
 
 class CartItemCard extends StatelessWidget {
@@ -43,7 +42,7 @@ class CartItemCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    snapshot.data.title,
+                    snapshot.data.name,
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -51,22 +50,6 @@ class CartItemCard extends StatelessWidget {
                     maxLines: 2,
                   ),
                   SizedBox(height: 10),
-                  Text.rich(
-                    TextSpan(
-                        text: "\$${snapshot.data.originalPrice}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: kPrimaryColor,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "  x${cartItem.itemCount}",
-                            style: TextStyle(
-                              color: kTextColor,
-                            ),
-                          ),
-                        ]),
-                  ),
                 ],
               ),
             ],

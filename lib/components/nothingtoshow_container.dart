@@ -18,7 +18,7 @@ class NothingToShowContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: SizeConfig.screenWidth * 0.75,
-      height: SizeConfig.screenHeight * 0.2,
+      height: SizeConfig.screenHeight * 0.3,
       child: Column(
         children: [
           SvgPicture.asset(

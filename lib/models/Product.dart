@@ -10,12 +10,15 @@ enum ProductType {
   Others,
 }
 
+enum SexType { Male, Female }
+
 class Product extends Model {
   static const String IMAGES_KEY = "images";
-  static const String TITLE_KEY = "title";
+  static const String NAME_KEY = "name";
   static const String VARIANT_KEY = "variant";
-  static const String DISCOUNT_PRICE_KEY = "discount_price";
-  static const String ORIGINAL_PRICE_KEY = "original_price";
+  static const String WEIGHT_KEY = "weight";
+  static const String AGE_KEY = "age";
+  static const String SEX_TYPE_KEY = "sex_type";
   static const String RATING_KEY = "rating";
   static const String HIGHLIGHTS_KEY = "highlights";
   static const String DESCRIPTION_KEY = "description";
@@ -25,10 +28,11 @@ class Product extends Model {
   static const String SEARCH_TAGS_KEY = "search_tags";
 
   List<String> images;
-  String title;
+  String name;
   String variant;
-  num discountPrice;
-  num originalPrice;
+  double weight;
+  int age;
+  SexType sexType;
   num rating;
   String highlights;
   String description;
@@ -41,11 +45,12 @@ class Product extends Model {
   Product(
     String id, {
     this.images,
-    this.title,
+    this.name,
     this.variant,
+    this.weight,
+    this.age,
+    this.sexType,
     this.productType,
-    this.discountPrice,
-    this.originalPrice,
     this.rating = 0.0,
     this.highlights,
     this.description,
@@ -54,12 +59,6 @@ class Product extends Model {
     this.searchTags,
   }) : super(id);
 
-  int calculatePercentageDiscount() {
-    int discount =
-        (((originalPrice - discountPrice) * 100) / originalPrice).round();
-    return discount;
-  }
-
   factory Product.fromMap(Map<String, dynamic> map, {String id}) {
     if (map[SEARCH_TAGS_KEY] == null) {
       map[SEARCH_TAGS_KEY] = List<String>();
@@ -67,12 +66,12 @@ class Product extends Model {
     return Product(
       id,
       images: map[IMAGES_KEY].cast<String>(),
-      title: map[TITLE_KEY],
+      name: map[NAME_KEY],
       variant: map[VARIANT_KEY],
-      productType:
-          EnumToString.fromString(ProductType.values, map[PRODUCT_TYPE_KEY]),
-      discountPrice: map[DISCOUNT_PRICE_KEY],
-      originalPrice: map[ORIGINAL_PRICE_KEY],
+      weight: map[WEIGHT_KEY],
+      age: map[AGE_KEY],
+      sexType: EnumToString.fromString(SexType.values, map[SEX_TYPE_KEY]),
+      productType: EnumToString.fromString(ProductType.values, map[PRODUCT_TYPE_KEY]),
       rating: map[RATING_KEY],
       highlights: map[HIGHLIGHTS_KEY],
       description: map[DESCRIPTION_KEY],
@@ -86,11 +85,12 @@ class Product extends Model {
   Map<String, dynamic> toMap() {
     final map = <String, dynamic>{
       IMAGES_KEY: images,
-      TITLE_KEY: title,
+      NAME_KEY: name,
       VARIANT_KEY: variant,
+      WEIGHT_KEY: weight,
+      AGE_KEY: age,
+      SEX_TYPE_KEY: EnumToString.convertToString(sexType),
       PRODUCT_TYPE_KEY: EnumToString.convertToString(productType),
-      DISCOUNT_PRICE_KEY: discountPrice,
-      ORIGINAL_PRICE_KEY: originalPrice,
       RATING_KEY: rating,
       HIGHLIGHTS_KEY: highlights,
       DESCRIPTION_KEY: description,
@@ -106,16 +106,16 @@ class Product extends Model {
   Map<String, dynamic> toUpdateMap() {
     final map = <String, dynamic>{};
     if (images != null) map[IMAGES_KEY] = images;
-    if (title != null) map[TITLE_KEY] = title;
+    if (name != null) map[NAME_KEY] = name;
     if (variant != null) map[VARIANT_KEY] = variant;
-    if (discountPrice != null) map[DISCOUNT_PRICE_KEY] = discountPrice;
-    if (originalPrice != null) map[ORIGINAL_PRICE_KEY] = originalPrice;
+    if (weight != null) map[WEIGHT_KEY] = weight;
+    if (age != null) map[AGE_KEY] = age;
+    if (sexType != null) map[SEX_TYPE_KEY] = EnumToString.convertToString(sexType);
     if (rating != null) map[RATING_KEY] = rating;
     if (highlights != null) map[HIGHLIGHTS_KEY] = highlights;
     if (description != null) map[DESCRIPTION_KEY] = description;
     if (seller != null) map[SELLER_KEY] = seller;
-    if (productType != null)
-      map[PRODUCT_TYPE_KEY] = EnumToString.convertToString(productType);
+    if (productType != null) map[PRODUCT_TYPE_KEY] = EnumToString.convertToString(productType);
     if (owner != null) map[OWNER_KEY] = owner;
     if (searchTags != null) map[SEARCH_TAGS_KEY] = searchTags;
 

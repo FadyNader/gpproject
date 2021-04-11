@@ -47,7 +47,7 @@ class ProductShortDetailCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        product.title,
+                        product.name,
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -58,26 +58,6 @@ class ProductShortDetailCard extends StatelessWidget {
                         maxLines: 2,
                       ),
                       SizedBox(height: 10),
-                      Text.rich(
-                        TextSpan(
-                            text: "\$${product.discountPrice}    ",
-                            style: TextStyle(
-                              color: kPrimaryColor,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: "\$${product.originalPrice}",
-                                style: TextStyle(
-                                  color: kTextColor,
-                                  decoration: TextDecoration.lineThrough,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ]),
-                      ),
                     ],
                   ),
                 ),

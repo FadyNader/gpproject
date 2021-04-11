@@ -1,9 +1,6 @@
 import 'package:e_commerce_app_flutter/models/Product.dart';
-import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../constants.dart';
 import 'expandable_text.dart';
 
 class ProductDescription extends StatelessWidget {
@@ -22,7 +19,7 @@ class ProductDescription extends StatelessWidget {
           children: [
             Text.rich(
               TextSpan(
-                  text: product.title,
+                  text: product.name,
                   style: TextStyle(
                     fontSize: 21,
                     color: Colors.black,
@@ -36,62 +33,28 @@ class ProductDescription extends StatelessWidget {
                         fontSize: 15,
                       ),
                     ),
-                  ]),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: getProportionateScreenHeight(64),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    flex: 4,
-                    child: Text.rich(
-                      TextSpan(
-                        text: "\$${product.discountPrice}   ",
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 24,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "\n\$${product.originalPrice}",
-                            style: TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: kTextColor,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+                    TextSpan(
+                      text: "\nWeight: ${product.weight} ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 15,
                       ),
                     ),
-                  ),
-                  Flexible(
-                    flex: 3,
-                    child: Stack(
-                      children: [
-                        SvgPicture.asset(
-                          "assets/icons/Discount.svg",
-                          color: kPrimaryColor,
-                        ),
-                        Center(
-                          child: Text(
-                            "${product.calculatePercentageDiscount()}%\nOff",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: getProportionateScreenHeight(15),
-                              fontWeight: FontWeight.w900,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
+                    TextSpan(
+                      text: "\nAge: ${product.age} ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 15,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    TextSpan(
+                      text: "\nSex: ${product.sexType.toString().replaceAll("SexType.", "")} ",
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ]),
             ),
             const SizedBox(height: 16),
             ExpandableText(
@@ -113,7 +76,7 @@ class ProductDescription extends StatelessWidget {
                 ),
                 children: [
                   TextSpan(
-                    text: "${product.seller}",
+                    text: "${product.seller ?? "Unknown name"}",
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                     ),

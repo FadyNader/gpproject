@@ -28,7 +28,7 @@ class ProductReviewsSection extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  "Pet Reviews",
+                  "Pet Comments",
                   style: TextStyle(
                     fontSize: 21,
                     color: Colors.black,
@@ -38,8 +38,7 @@ class ProductReviewsSection extends StatelessWidget {
                 SizedBox(height: getProportionateScreenHeight(20)),
                 Expanded(
                   child: StreamBuilder<List<Review>>(
-                    stream: ProductDatabaseHelper()
-                        .getAllReviewsStreamForProductId(product.id),
+                    stream: ProductDatabaseHelper().getAllReviewsStreamForProductId(product.id),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         final reviewsList = snapshot.data;
@@ -54,7 +53,7 @@ class ProductReviewsSection extends StatelessWidget {
                                 ),
                                 SizedBox(height: 8),
                                 Text(
-                                  "No reviews yet",
+                                  "No comments yet",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -72,8 +71,7 @@ class ProductReviewsSection extends StatelessWidget {
                             );
                           },
                         );
-                      } else if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
+                      } else if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
                           child: CircularProgressIndicator(),
                         );
@@ -105,7 +103,7 @@ class ProductReviewsSection extends StatelessWidget {
 
   Widget buildProductRatingWidget(num rating) {
     return Container(
-      width: getProportionateScreenWidth(80),
+      width: getProportionateScreenWidth(100),
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.amber,

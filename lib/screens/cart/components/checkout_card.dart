@@ -1,5 +1,4 @@
 import 'package:e_commerce_app_flutter/components/default_button.dart';
-import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../size_config.dart';
@@ -40,27 +39,6 @@ class CheckoutCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                FutureBuilder<num>(
-                  future: UserDatabaseHelper().cartTotal,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final cartTotal = snapshot.data;
-                      return Text.rich(
-                        TextSpan(text: "Total\n", children: [
-                          TextSpan(
-                            text: "\₹$cartTotal",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ]),
-                      );
-                    }
-                    return Center(child: CircularProgressIndicator());
-                  },
-                ),
                 SizedBox(
                   width: getProportionateScreenWidth(190),
                   child: DefaultButton(

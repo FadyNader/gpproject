@@ -19,6 +19,7 @@ class CustomImage {
 class ProductDetails extends ChangeNotifier {
   List<CustomImage> _selectedImages = List<CustomImage>();
   ProductType _productType;
+  SexType _sexType;
   List<String> _searchTags = List<String>();
 
   List<CustomImage> get selectedImages {
@@ -56,6 +57,19 @@ class ProductDetails extends ChangeNotifier {
 
   set productType(ProductType type) {
     _productType = type;
+    notifyListeners();
+  }
+
+  SexType get sexType {
+    return _sexType;
+  }
+
+  set initialSexType(SexType type) {
+    _sexType = type;
+  }
+
+  set sexType(SexType type) {
+    _sexType = type;
     notifyListeners();
   }
 

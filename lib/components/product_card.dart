@@ -1,9 +1,9 @@
+import 'package:e_commerce_app_flutter/models/Product.dart';
 import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:logger/logger.dart';
+
 import '../constants.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
 
 class ProductCard extends StatelessWidget {
   final String productId;
@@ -79,7 +79,7 @@ class ProductCard extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: Text(
-                  "${product.title}\n",
+                  "${product.name}\n",
                   style: TextStyle(
                     color: kTextColor,
                     fontSize: 13,
@@ -90,60 +90,6 @@ class ProductCard extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 5),
-              Flexible(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      flex: 5,
-                      child: Text.rich(
-                        TextSpan(
-                          text: "\$${product.discountPrice}\n",
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: "\$${product.originalPrice}",
-                              style: TextStyle(
-                                color: kTextColor,
-                                decoration: TextDecoration.lineThrough,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 3,
-                      child: Stack(
-                        children: [
-                          SvgPicture.asset(
-                            "assets/icons/DiscountTag.svg",
-                            color: kPrimaryColor,
-                          ),
-                          Center(
-                            child: Text(
-                              "${product.calculatePercentageDiscount()}%\nOff",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w900,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
         ),

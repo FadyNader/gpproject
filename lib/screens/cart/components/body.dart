@@ -47,8 +47,7 @@ class _BodyState extends State<Body> {
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(screenPadding)),
+            padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
             child: SizedBox(
               width: double.infinity,
               child: Column(
@@ -97,7 +96,7 @@ class _BodyState extends State<Body> {
           return Column(
             children: [
               DefaultButton(
-                text: "Proceed to Payment",
+                text: "Proceed to Adoption",
                 press: () {
                   bottomSheetHandler = Scaffold.of(context).showBottomSheet(
                     (context) {
@@ -118,8 +117,7 @@ class _BodyState extends State<Body> {
                     if (index >= cartItemsId.length) {
                       return SizedBox(height: getProportionateScreenHeight(80));
                     }
-                    return buildCartItemDismissible(
-                        context, cartItemsId[index], index);
+                    return buildCartItemDismissible(context, cartItemsId[index], index);
                   },
                 ),
               ),
@@ -144,8 +142,7 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget buildCartItemDismissible(
-      BuildContext context, String cartItemId, int index) {
+  Widget buildCartItemDismissible(BuildContext context, String cartItemId, int index) {
     return Dismissible(
       key: Key(cartItemId),
       direction: DismissDirection.startToEnd,
@@ -165,8 +162,7 @@ class _BodyState extends State<Body> {
               bool result = false;
               String snackbarMessage;
               try {
-                result = await UserDatabaseHelper()
-                    .removeProductFromCart(cartItemId);
+                result = await UserDatabaseHelper().removeProductFromCart(cartItemId);
                 if (result == true) {
                   snackbarMessage = "Pet removed from cart successfully";
                   await refreshPage();
@@ -261,8 +257,7 @@ class _BodyState extends State<Body> {
                         ),
                         SizedBox(height: 8),
                         FutureBuilder<CartItem>(
-                          future: UserDatabaseHelper()
-                              .getCartItemFromId(cartItemId),
+                          future: UserDatabaseHelper().getCartItemFromId(cartItemId),
                           builder: (context, snapshot) {
                             int itemCount = 0;
                             if (snapshot.hasData) {
@@ -365,17 +360,13 @@ class _BodyState extends State<Body> {
       if (orderedProductsUid != null) {
         print(orderedProductsUid);
         final dateTime = DateTime.now();
-        final formatedDateTime =
-            "${dateTime.day}-${dateTime.month}-${dateTime.year}";
-        List<OrderedProduct> orderedProducts = orderedProductsUid
-            .map((e) => OrderedProduct(null,
-                productUid: e, orderDate: formatedDateTime))
-            .toList();
+        final formatedDateTime = "${dateTime.day}-${dateTime.month}-${dateTime.year}";
+        List<OrderedProduct> orderedProducts =
+            orderedProductsUid.map((e) => OrderedProduct(null, productUid: e, orderDate: formatedDateTime)).toList();
         bool addedProductsToMyProducts = false;
         String snackbarmMessage;
         try {
-          addedProductsToMyProducts =
-              await UserDatabaseHelper().addToMyOrders(orderedProducts);
+          addedProductsToMyProducts = await UserDatabaseHelper().addToMyOrders(orderedProducts);
           if (addedProductsToMyProducts) {
             snackbarmMessage = "Pet ordered Successfully";
           } else {
