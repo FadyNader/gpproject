@@ -3,6 +3,7 @@ import 'package:e_commerce_app_flutter/models/Address.dart';
 import 'package:e_commerce_app_flutter/models/CartItem.dart';
 import 'package:e_commerce_app_flutter/models/OrderedProduct.dart';
 import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class UserDatabaseHelper {
   static const String USERS_COLLECTION_NAME = "users";
@@ -13,6 +14,8 @@ class UserDatabaseHelper {
   static const String PHONE_KEY = 'phone';
   static const String DP_KEY = "display_picture";
   static const String FAV_PRODUCTS_KEY = "favourite_products";
+  static const String FCM_TOKEN_KEY = "fcm_token";
+  static const String INCOMING_ORDERS_KEY = "incoming_orders";
 
   UserDatabaseHelper._privateConstructor();
   static UserDatabaseHelper _instance = UserDatabaseHelper._privateConstructor();
@@ -28,10 +31,26 @@ class UserDatabaseHelper {
   }
 
   Future<void> createNewUser(String uid) async {
+    FirebaseMessaging messaging = FirebaseMessaging();
     await firestore.collection(USERS_COLLECTION_NAME).doc(uid).set({
       DP_KEY: null,
       PHONE_KEY: null,
       FAV_PRODUCTS_KEY: List<String>(),
+      FCM_TOKEN_KEY: await messaging.getToken(),
+      INCOMING_ORDERS_KEY: List(),
+    });
+  }
+
+  Future<void> setUserToken(String uid) async {
+    FirebaseMessaging messaging = FirebaseMessaging();
+    await firestore.collection(USERS_COLLECTION_NAME).doc(uid).update({
+      FCM_TOKEN_KEY: await messaging.getToken(),
+    });
+  }
+
+  Future<void> removeUserToken(String uid) async {
+    await firestore.collection(USERS_COLLECTION_NAME).doc(uid).update({
+      FCM_TOKEN_KEY: null,
     });
   }
 
@@ -220,6 +239,13 @@ class UserDatabaseHelper {
     return orderedProductsId;
   }
 
+  Future<List<String>> get incomingOrdersProductsList async {
+    String uid = AuthentificationService().currentUser.uid;
+    final orderedProductsSnapshot = await firestore.collection(USERS_COLLECTION_NAME).doc(uid).get();
+    List orderedProductsId = List<String>.from(orderedProductsSnapshot.data()["incoming_orders"]);
+    return orderedProductsId;
+  }
+
   Future<bool> addToMyOrders(List<OrderedProduct> orders) async {
     String uid = AuthentificationService().currentUser.uid;
     final orderedProductsCollectionRef =
@@ -234,6 +260,12 @@ class UserDatabaseHelper {
     String uid = AuthentificationService().currentUser.uid;
     final doc =
         await firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(ORDERED_PRODUCTS_COLLECTION_NAME).doc(id).get();
+    final orderedProduct = OrderedProduct.fromMap(doc.data(), id: doc.id);
+    return orderedProduct;
+  }
+
+  Future<OrderedProduct> getOrderedProductFromPath(String path) async {
+    final doc = await firestore.doc(path).get();
     final orderedProduct = OrderedProduct.fromMap(doc.data(), id: doc.id);
     return orderedProduct;
   }

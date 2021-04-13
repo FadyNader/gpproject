@@ -2,13 +2,14 @@ import 'package:e_commerce_app_flutter/exceptions/firebaseauth/messeged_firebase
 import 'package:e_commerce_app_flutter/exceptions/firebaseauth/signin_exceptions.dart';
 import 'package:e_commerce_app_flutter/screens/forgot_password/forgot_password_screen.dart';
 import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
+import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:future_progress_dialog/future_progress_dialog.dart';
 import 'package:logger/logger.dart';
 
 import '../../../components/custom_suffix_icon.dart';
 import '../../../components/default_button.dart';
-import 'package:flutter/material.dart';
-
 import '../../../constants.dart';
 import '../../../size_config.dart';
 
@@ -145,6 +146,7 @@ class _SignInFormState extends State<SignInForm> {
         );
         if (signInStatus == true) {
           snackbarMessage = "Signed In Successfully";
+          await UserDatabaseHelper().setUserToken(FirebaseAuth.instance.currentUser.uid);
         } else {
           throw FirebaseSignInAuthUnknownReasonFailure();
         }

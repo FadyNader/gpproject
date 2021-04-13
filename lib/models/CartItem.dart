@@ -5,6 +5,7 @@ class CartItem extends Model {
   static const String ITEM_COUNT_KEY = "item_count";
 
   int itemCount;
+
   CartItem({
     String id,
     this.itemCount = 0,

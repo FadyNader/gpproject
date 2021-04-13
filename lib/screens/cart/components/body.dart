@@ -12,6 +12,7 @@ import 'package:e_commerce_app_flutter/services/data_streams/cart_items_stream.d
 import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
 import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
+import 'package:enum_to_string/enum_to_string.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:future_progress_dialog/future_progress_dialog.dart';
@@ -27,6 +28,13 @@ class Body extends StatefulWidget {
 class _BodyState extends State<Body> {
   final CartItemsStream cartItemsStream = CartItemsStream();
   PersistentBottomSheetController bottomSheetHandler;
+
+  TextEditingController subjectFieldController = TextEditingController();
+  TextEditingController descriptionFieldController = TextEditingController();
+  TextEditingController dateTimeMeetingFieldController = TextEditingController();
+
+  AdoptionType _adoptionType;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +45,10 @@ class _BodyState extends State<Body> {
   void dispose() {
     super.dispose();
     cartItemsStream.dispose();
+
+    subjectFieldController.dispose();
+    descriptionFieldController.dispose();
+    dateTimeMeetingFieldController.dispose();
   }
 
   @override
@@ -58,6 +70,14 @@ class _BodyState extends State<Body> {
                     style: headingStyle,
                   ),
                   SizedBox(height: getProportionateScreenHeight(20)),
+                  buildSubjectField(),
+                  SizedBox(height: getProportionateScreenHeight(20)),
+                  buildDescriptionField(),
+                  SizedBox(height: getProportionateScreenHeight(20)),
+                  buildDateTimeMeetingField(),
+                  SizedBox(height: getProportionateScreenHeight(20)),
+                  buildAdoptionTypeDropdown(),
+                  SizedBox(height: getProportionateScreenHeight(20)),
                   SizedBox(
                     height: SizeConfig.screenHeight * 0.75,
                     child: Center(
@@ -69,6 +89,101 @@ class _BodyState extends State<Body> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildSubjectField() {
+    return TextFormField(
+      controller: subjectFieldController,
+      keyboardType: TextInputType.name,
+      decoration: InputDecoration(
+        hintText: "e.g.,  Your pet adoption",
+        labelText: "Adoption Subject",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
+      validator: (_) {
+        if (subjectFieldController.text.isEmpty) {
+          return FIELD_REQUIRED_MSG;
+        }
+        return null;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget buildDescriptionField() {
+    return TextFormField(
+      controller: descriptionFieldController,
+      keyboardType: TextInputType.name,
+      decoration: InputDecoration(
+        hintText: "e.g.,  Write here your description",
+        labelText: "Adoption Description",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
+      validator: (_) {
+        if (descriptionFieldController.text.isEmpty) {
+          return FIELD_REQUIRED_MSG;
+        }
+        return null;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget buildDateTimeMeetingField() {
+    return TextFormField(
+      controller: dateTimeMeetingFieldController,
+      keyboardType: TextInputType.name,
+      decoration: InputDecoration(
+        hintText: "e.g.,  20/5/2021, 4PM",
+        labelText: "Date Time to Meet",
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
+      validator: (_) {
+        if (dateTimeMeetingFieldController.text.isEmpty) {
+          return FIELD_REQUIRED_MSG;
+        }
+        return null;
+      },
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+    );
+  }
+
+  Widget buildAdoptionTypeDropdown() {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 6,
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(color: kTextColor, width: 1),
+        borderRadius: BorderRadius.all(Radius.circular(28)),
+      ),
+      child: DropdownButton(
+        value: _adoptionType,
+        items: AdoptionType.values
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(
+                  EnumToString.convertToString(e),
+                ),
+              ),
+            )
+            .toList(),
+        hint: Text(
+          "Choose Adoption Type",
+        ),
+        style: TextStyle(
+          color: kTextColor,
+          fontSize: 16,
+        ),
+        onChanged: (value) {
+          setState(()=>_adoptionType = value);
+        },
+        elevation: 0,
+        underline: SizedBox(width: 0, height: 0),
       ),
     );
   }
@@ -361,8 +476,18 @@ class _BodyState extends State<Body> {
         print(orderedProductsUid);
         final dateTime = DateTime.now();
         final formatedDateTime = "${dateTime.day}-${dateTime.month}-${dateTime.year}";
-        List<OrderedProduct> orderedProducts =
-            orderedProductsUid.map((e) => OrderedProduct(null, productUid: e, orderDate: formatedDateTime)).toList();
+        List<OrderedProduct> orderedProducts = orderedProductsUid
+            .map((e) => OrderedProduct(
+                  null,
+                  productUid: e,
+                  orderDate: formatedDateTime,
+                  status: StatusType.Ordered,
+                  subject: subjectFieldController.text.trim(),
+                  description: descriptionFieldController.text.trim(),
+                  dateTimeMeet: dateTimeMeetingFieldController.text.trim(),
+                  adoptionType: _adoptionType,
+                ))
+            .toList();
         bool addedProductsToMyProducts = false;
         String snackbarmMessage;
         try {

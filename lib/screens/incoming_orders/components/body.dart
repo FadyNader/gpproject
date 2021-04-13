@@ -1,17 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app_flutter/components/nothingtoshow_container.dart';
 import 'package:e_commerce_app_flutter/components/product_short_detail_card.dart';
 import 'package:e_commerce_app_flutter/constants.dart';
 import 'package:e_commerce_app_flutter/models/OrderedProduct.dart';
 import 'package:e_commerce_app_flutter/models/Product.dart';
-import 'package:e_commerce_app_flutter/models/Review.dart';
-import 'package:e_commerce_app_flutter/screens/my_orders/components/product_review_dialog.dart';
 import 'package:e_commerce_app_flutter/screens/product_details/product_details_screen.dart';
-import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
-import 'package:e_commerce_app_flutter/services/data_streams/ordered_products_stream.dart';
+import 'package:e_commerce_app_flutter/services/data_streams/incoming_orders_products_stream.dart';
 import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
 import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -21,18 +19,18 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  final OrderedProductsStream orderedProductsStream = OrderedProductsStream();
+  final IncomingOrdersProductsStream incomingOrdersProductsStream = IncomingOrdersProductsStream();
 
   @override
   void initState() {
     super.initState();
-    orderedProductsStream.init();
+    incomingOrdersProductsStream.init();
   }
 
   @override
   void dispose() {
     super.dispose();
-    orderedProductsStream.dispose();
+    incomingOrdersProductsStream.dispose();
   }
 
   @override
@@ -50,7 +48,7 @@ class _BodyState extends State<Body> {
                 children: [
                   SizedBox(height: getProportionateScreenHeight(10)),
                   Text(
-                    "Your Orders",
+                    "Incoming Orders",
                     style: headingStyle,
                   ),
                   SizedBox(height: getProportionateScreenHeight(20)),
@@ -68,17 +66,18 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> refreshPage() {
-    orderedProductsStream.reload();
+    incomingOrdersProductsStream.reload();
     return Future<void>.value();
   }
 
   Widget buildOrderedProductsList() {
     return StreamBuilder<List<String>>(
-      stream: orderedProductsStream.stream,
+      stream: incomingOrdersProductsStream.stream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final orderedProductsIds = snapshot.data;
-          if (orderedProductsIds.length == 0) {
+          print(snapshot.data);
+          final orderedProductsPaths = snapshot.data;
+          if (orderedProductsPaths.length == 0) {
             return Center(
               child: NothingToShowContainer(
                 iconPath: "assets/icons/empty_bag.svg",
@@ -88,14 +87,14 @@ class _BodyState extends State<Body> {
           }
           return ListView.builder(
             physics: BouncingScrollPhysics(),
-            itemCount: orderedProductsIds.length,
+            itemCount: orderedProductsPaths.length,
             itemBuilder: (context, index) {
               return FutureBuilder<OrderedProduct>(
-                future: UserDatabaseHelper().getOrderedProductFromId(orderedProductsIds[index]),
+                future: UserDatabaseHelper().getOrderedProductFromPath(orderedProductsPaths[index]),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final orderedProduct = snapshot.data;
-                    return buildOrderedProductItem(orderedProduct);
+                    return buildOrderedProductItem(orderedProduct, orderedProductsPaths[index]);
                   } else if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -130,7 +129,7 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget buildOrderedProductItem(OrderedProduct orderedProduct) {
+  Widget buildOrderedProductItem(OrderedProduct orderedProduct, String docPath) {
     return FutureBuilder<Product>(
       future: ProductDatabaseHelper().getProductWithID(orderedProduct.productUid),
       builder: (context, snapshot) {
@@ -289,83 +288,61 @@ class _BodyState extends State<Body> {
                     },
                   ),
                 ),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: kPrimaryColor,
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(16),
-                      bottomRight: Radius.circular(16),
+                if (orderedProduct.status == StatusType.Ordered)
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
                     ),
-                  ),
-                  child: FlatButton(
-                    onPressed: () async {
-                      String currentUserUid = AuthentificationService().currentUser.uid;
-                      Review prevReview;
-                      try {
-                        prevReview = await ProductDatabaseHelper().getProductReviewWithID(product.id, currentUserUid);
-                      } on FirebaseException catch (e) {
-                        Logger().w("Firebase Exception: $e");
-                      } catch (e) {
-                        Logger().w("Unknown Exception: $e");
-                      } finally {
-                        if (prevReview == null) {
-                          prevReview = Review(
-                            currentUserUid,
-                            reviewerUid: currentUserUid,
-                          );
-                        }
-                      }
-
-                      final result = await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return ProductReviewDialog(
-                            review: prevReview,
-                          );
-                        },
-                      );
-                      if (result is Review) {
-                        bool reviewAdded = false;
-                        String snackbarMessage;
-                        try {
-                          reviewAdded = await ProductDatabaseHelper().addProductReview(product.id, result);
-                          if (reviewAdded == true) {
-                            snackbarMessage = "Product review added successfully";
-                          } else {
-                            throw "Coulnd't add product review due to unknown reason";
-                          }
-                        } on FirebaseException catch (e) {
-                          Logger().w("Firebase Exception: $e");
-                          snackbarMessage = e.toString();
-                        } catch (e) {
-                          Logger().w("Unknown Exception: $e");
-                          snackbarMessage = e.toString();
-                        } finally {
-                          Logger().i(snackbarMessage);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(snackbarMessage),
-                            ),
-                          );
-                        }
-                      }
-                      await refreshPage();
-                    },
-                    child: Text(
-                      "Give Product Review",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+                    decoration: BoxDecoration(
+                      color: kPrimaryColor,
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(16),
+                        bottomRight: Radius.circular(16),
                       ),
                     ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: FlatButton(
+                            onPressed: () async {
+                              await FirebaseFirestore.instance
+                                  .doc(docPath)
+                                  .update({"status": EnumToString.convertToString(StatusType.Accepted)});
+                              await refreshPage();
+                            },
+                            child: Text(
+                              "Accept",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: FlatButton(
+                            onPressed: () async {
+                              await FirebaseFirestore.instance
+                                  .doc(docPath)
+                                  .update({"status": EnumToString.convertToString(StatusType.Rejected)});
+                              await refreshPage();
+                            },
+                            child: Text(
+                              "Reject",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           );
