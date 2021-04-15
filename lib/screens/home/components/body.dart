@@ -1,13 +1,13 @@
 import 'package:e_commerce_app_flutter/constants.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
+import 'package:e_commerce_app_flutter/models/Pet.dart';
 import 'package:e_commerce_app_flutter/screens/cart/cart_screen.dart';
-import 'package:e_commerce_app_flutter/screens/category_products/category_products_screen.dart';
-import 'package:e_commerce_app_flutter/screens/product_details/product_details_screen.dart';
+import 'package:e_commerce_app_flutter/screens/category_pets/category_pets_screen.dart';
+import 'package:e_commerce_app_flutter/screens/pet_details/pet_details_screen.dart';
 import 'package:e_commerce_app_flutter/screens/search_result/search_result_screen.dart';
 import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
-import 'package:e_commerce_app_flutter/services/data_streams/all_products_stream.dart';
-import 'package:e_commerce_app_flutter/services/data_streams/favourite_products_stream.dart';
-import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
+import 'package:e_commerce_app_flutter/services/data_streams/all_pets_stream.dart';
+import 'package:e_commerce_app_flutter/services/data_streams/favourite_pets_stream.dart';
+import 'package:e_commerce_app_flutter/services/database/pet_database_helper.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:future_progress_dialog/future_progress_dialog.dart';
@@ -15,12 +15,12 @@ import 'package:logger/logger.dart';
 
 import '../../../utils.dart';
 import '../components/home_header.dart';
-import 'product_type_box.dart';
-import 'products_section.dart';
+import 'pet_type_box.dart';
+import 'pets_section.dart';
 
 const String ICON_KEY = "icon";
 const String TITLE_KEY = "title";
-const String PRODUCT_TYPE_KEY = "product_type";
+const String PET_TYPE_KEY = "pet_type";
 
 class Body extends StatefulWidget {
   @override
@@ -28,53 +28,53 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  final productCategories = <Map>[
+  final petCategories = <Map>[
     <String, dynamic>{
       ICON_KEY: "assets/icons/cat.svg",
       TITLE_KEY: "Cats",
-      PRODUCT_TYPE_KEY: ProductType.Cats,
+      PET_TYPE_KEY: PetType.Cats,
     },
     <String, dynamic>{
       ICON_KEY: "assets/icons/dogs.svg",
       TITLE_KEY: "Dogs",
-      PRODUCT_TYPE_KEY: ProductType.Dogs,
+      PET_TYPE_KEY: PetType.Dogs,
     },
     <String, dynamic>{
       ICON_KEY: "assets/icons/birds.svg",
       TITLE_KEY: "Birds",
-      PRODUCT_TYPE_KEY: ProductType.Birds,
+      PET_TYPE_KEY: PetType.Birds,
     },
     <String, dynamic>{
       ICON_KEY: "assets/icons/Hamsters.svg",
       TITLE_KEY: "Hamsters",
-      PRODUCT_TYPE_KEY: ProductType.Hamsters,
+      PET_TYPE_KEY: PetType.Hamsters,
     },
     <String, dynamic>{
       ICON_KEY: "assets/icons/Turtles.svg",
       TITLE_KEY: "Turtles",
-      PRODUCT_TYPE_KEY: ProductType.Turtles,
+      PET_TYPE_KEY: PetType.Turtles,
     },
     <String, dynamic>{
       ICON_KEY: "assets/icons/Others.svg",
       TITLE_KEY: "Others",
-      PRODUCT_TYPE_KEY: ProductType.Others,
+      PET_TYPE_KEY: PetType.Others,
     },
   ];
 
-  final FavouriteProductsStream favouriteProductsStream = FavouriteProductsStream();
-  final AllProductsStream allProductsStream = AllProductsStream();
+  final FavouritePetsStream favouritePetsStream = FavouritePetsStream();
+  final AllPetsStream allPetsStream = AllPetsStream();
 
   @override
   void initState() {
     super.initState();
-    favouriteProductsStream.init();
-    allProductsStream.init();
+    favouritePetsStream.init();
+    allPetsStream.init();
   }
 
   @override
   void dispose() {
-    favouriteProductsStream.dispose();
-    allProductsStream.dispose();
+    favouritePetsStream.dispose();
+    allPetsStream.dispose();
     super.dispose();
   }
 
@@ -96,16 +96,16 @@ class _BodyState extends State<Body> {
                   onSearchSubmitted: (value) async {
                     final query = value.toString();
                     if (query.length <= 0) return;
-                    List<Product> searchedProducts;
+                    List<Pet> searchedPets;
                     try {
-                      searchedProducts = await ProductDatabaseHelper().searchInProducts(query.toLowerCase());
-                      if (searchedProducts != null) {
+                      searchedPets = await PetDatabaseHelper().searchInPets(query.toLowerCase());
+                      if (searchedPets != null) {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => SearchResultScreen(
                               searchQuery: query,
-                              searchResultProducts: searchedProducts,
+                              searchResultPets: searchedPets,
                               searchIn: "All Pets",
                             ),
                           ),
@@ -163,17 +163,17 @@ class _BodyState extends State<Body> {
                       physics: BouncingScrollPhysics(),
                       children: [
                         ...List.generate(
-                          productCategories.length,
+                          petCategories.length,
                           (index) {
-                            return ProductTypeBox(
-                              icon: productCategories[index][ICON_KEY],
-                              title: productCategories[index][TITLE_KEY],
+                            return PeTypeBox(
+                              icon: petCategories[index][ICON_KEY],
+                              title: petCategories[index][TITLE_KEY],
                               onPress: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => CategoryProductsScreen(
-                                      productType: productCategories[index][PRODUCT_TYPE_KEY],
+                                    builder: (context) => CategoryPetsScreen(
+                                      petType: petCategories[index][PET_TYPE_KEY],
                                     ),
                                   ),
                                 );
@@ -188,21 +188,21 @@ class _BodyState extends State<Body> {
                 SizedBox(height: getProportionateScreenHeight(20)),
                 SizedBox(
                   height: SizeConfig.screenHeight * 0.5,
-                  child: ProductsSection(
+                  child: PetsSection(
                     sectionTitle: "Pets You Like",
-                    productsStreamController: favouriteProductsStream,
+                    petsStreamController: favouritePetsStream,
                     emptyListMessage: "Add Pet to Favourites",
-                    onProductCardTapped: onProductCardTapped,
+                    onPetCardTapped: onPetCardTapped,
                   ),
                 ),
                 SizedBox(height: getProportionateScreenHeight(20)),
                 SizedBox(
                   height: SizeConfig.screenHeight * 0.8,
-                  child: ProductsSection(
+                  child: PetsSection(
                     sectionTitle: "Explore All Pets",
-                    productsStreamController: allProductsStream,
+                    petsStreamController: allPetsStream,
                     emptyListMessage: "Looks like all Stores are closed",
-                    onProductCardTapped: onProductCardTapped,
+                    onPetCardTapped: onPetCardTapped,
                   ),
                 ),
                 SizedBox(height: getProportionateScreenHeight(80)),
@@ -215,16 +215,16 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> refreshPage() {
-    favouriteProductsStream.reload();
-    allProductsStream.reload();
+    favouritePetsStream.reload();
+    allPetsStream.reload();
     return Future<void>.value();
   }
 
-  void onProductCardTapped(Product product) {
+  void onPetCardTapped(Pet pet) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductDetailsScreen(product: product),
+        builder: (context) => PetDetailsScreen(pet: pet),
       ),
     ).then((_) async {
       await refreshPage();

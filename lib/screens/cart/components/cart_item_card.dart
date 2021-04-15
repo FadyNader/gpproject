@@ -1,6 +1,6 @@
 import 'package:e_commerce_app_flutter/models/CartItem.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
-import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
+import 'package:e_commerce_app_flutter/models/Pet.dart';
+import 'package:e_commerce_app_flutter/services/database/pet_database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 
@@ -15,8 +15,8 @@ class CartItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Product>(
-      future: ProductDatabaseHelper().getProductWithID(cartItem.id),
+    return FutureBuilder<Pet>(
+      future: PetDatabaseHelper().getPetWithID(cartItem.id),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Row(

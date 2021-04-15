@@ -1,16 +1,19 @@
 import 'package:e_commerce_app_flutter/constants.dart';
 import 'package:e_commerce_app_flutter/screens/about_developer/about_developer_screen.dart';
+import 'package:e_commerce_app_flutter/screens/alarms/alarms_screen.dart';
 import 'package:e_commerce_app_flutter/screens/change_display_picture/change_display_picture_screen.dart';
 import 'package:e_commerce_app_flutter/screens/change_email/change_email_screen.dart';
 import 'package:e_commerce_app_flutter/screens/change_password/change_password_screen.dart';
 import 'package:e_commerce_app_flutter/screens/change_phone/change_phone_screen.dart';
-import 'package:e_commerce_app_flutter/screens/edit_product/edit_product_screen.dart';
+import 'package:e_commerce_app_flutter/screens/edit_pet/edit_pet_screen.dart';
 import 'package:e_commerce_app_flutter/screens/incoming_orders/incoming_orders_screen.dart';
 import 'package:e_commerce_app_flutter/screens/manage_addresses/manage_addresses_screen.dart';
 import 'package:e_commerce_app_flutter/screens/my_orders/my_orders_screen.dart';
-import 'package:e_commerce_app_flutter/screens/my_products/my_products_screen.dart';
+import 'package:e_commerce_app_flutter/screens/my_pets/my_pets_screen.dart';
 import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
+import 'package:e_commerce_app_flutter/services/database/alarms_database_helper.dart';
 import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
+import 'package:e_commerce_app_flutter/services/local_notifications/notifications_manager.dart';
 import 'package:e_commerce_app_flutter/utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -149,6 +152,40 @@ class HomeScreenDrawer extends StatelessWidget {
               );
             },
           ),
+          ListTile(
+            leading: Icon(Icons.alarm),
+            title: Text(
+              "Alarms",
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
+            onTap: () async {
+              bool allowed = AuthentificationService().currentUserVerified;
+              if (!allowed) {
+                final reverify = await showConfirmationDialog(
+                    context, "You haven't verified your email address. This action is only allowed for verified users.",
+                    positiveResponse: "Resend verification email", negativeResponse: "Go back");
+                if (reverify) {
+                  final future = AuthentificationService().sendVerificationEmailToCurrentUser();
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return FutureProgressDialog(
+                        future,
+                        message: Text("Resending verification email"),
+                      );
+                    },
+                  );
+                }
+                return;
+              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AlarmsScreen(),
+                ),
+              );
+            },
+          ),
           buildSellerExpansionTile(context),
           ListTile(
             leading: Icon(Icons.info),
@@ -176,6 +213,8 @@ class HomeScreenDrawer extends StatelessWidget {
               if (confirmation) {
                 AuthentificationService().signOut();
                 await UserDatabaseHelper().removeUserToken(FirebaseAuth.instance.currentUser.uid);
+                await AlarmProvider.instance.deleteAll();
+                await NotificationManager.instance.clearAllNotifications();
               }
             },
           ),
@@ -356,7 +395,7 @@ class HomeScreenDrawer extends StatelessWidget {
               }
               return;
             }
-            Navigator.push(context, MaterialPageRoute(builder: (context) => EditProductScreen()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => EditPetScreen()));
           },
         ),
         ListTile(
@@ -390,7 +429,7 @@ class HomeScreenDrawer extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MyProductsScreen(),
+                builder: (context) => MyPetsScreen(),
               ),
             );
           },

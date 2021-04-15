@@ -36,8 +36,7 @@ class _ChangeEmailFormState extends State<ChangeEmailForm> {
     final form = Form(
       key: _formKey,
       child: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: getProportionateScreenWidth(screenPadding)),
+        padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
         child: Column(
           children: [
             buildCurrentEmailFormField(),
@@ -96,8 +95,7 @@ class _ChangeEmailFormState extends State<ChangeEmailForm> {
       stream: AuthentificationService().userChanges,
       builder: (context, snapshot) {
         String currentEmail;
-        if (snapshot.hasData && snapshot.data != null)
-          currentEmail = snapshot.data.email;
+        if (snapshot.hasData && snapshot.data != null) currentEmail = snapshot.data.email;
         final textField = TextFormField(
           controller: currentEmailController,
           decoration: InputDecoration(
@@ -145,21 +143,17 @@ class _ChangeEmailFormState extends State<ChangeEmailForm> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       final AuthentificationService authService = AuthentificationService();
-      bool passwordValidation =
-          await authService.verifyCurrentUserPassword(passwordController.text);
+      bool passwordValidation = await authService.verifyCurrentUserPassword(passwordController.text);
       if (passwordValidation) {
         bool updationStatus = false;
         String snackbarMessage;
         try {
-          updationStatus = await authService.changeEmailForCurrentUser(
-              newEmail: newEmailController.text);
+          updationStatus = await authService.changeEmailForCurrentUser(newEmail: newEmailController.text);
           if (updationStatus == true) {
-            snackbarMessage =
-                "Verification email sent. Please verify your new email";
+            snackbarMessage = "Verification email sent. Please verify your new email";
           } else {
             throw FirebaseCredentialActionAuthUnknownReasonFailureException(
-                message:
-                    "Couldn't process your request now. Please try again later");
+                message: "Couldn't process your request now. Please try again later");
           }
         } on MessagedFirebaseAuthException catch (e) {
           snackbarMessage = e.message;

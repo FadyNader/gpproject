@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app_flutter/components/nothingtoshow_container.dart';
-import 'package:e_commerce_app_flutter/components/product_short_detail_card.dart';
+import 'package:e_commerce_app_flutter/components/pet_short_detail_card.dart';
 import 'package:e_commerce_app_flutter/constants.dart';
-import 'package:e_commerce_app_flutter/models/OrderedProduct.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
-import 'package:e_commerce_app_flutter/screens/product_details/product_details_screen.dart';
-import 'package:e_commerce_app_flutter/services/data_streams/incoming_orders_products_stream.dart';
-import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
+import 'package:e_commerce_app_flutter/models/OrderedPet.dart';
+import 'package:e_commerce_app_flutter/models/Pet.dart';
+import 'package:e_commerce_app_flutter/screens/pet_details/pet_details_screen.dart';
+import 'package:e_commerce_app_flutter/services/data_streams/incoming_orders_pets_stream.dart';
+import 'package:e_commerce_app_flutter/services/database/pet_database_helper.dart';
 import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:enum_to_string/enum_to_string.dart';
@@ -19,18 +19,18 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  final IncomingOrdersProductsStream incomingOrdersProductsStream = IncomingOrdersProductsStream();
+  final IncomingOrdersPetsStream incomingOrdersPetsStream = IncomingOrdersPetsStream();
 
   @override
   void initState() {
     super.initState();
-    incomingOrdersProductsStream.init();
+    incomingOrdersPetsStream.init();
   }
 
   @override
   void dispose() {
     super.dispose();
-    incomingOrdersProductsStream.dispose();
+    incomingOrdersPetsStream.dispose();
   }
 
   @override
@@ -54,7 +54,7 @@ class _BodyState extends State<Body> {
                   SizedBox(height: getProportionateScreenHeight(20)),
                   SizedBox(
                     height: SizeConfig.screenHeight * 0.75,
-                    child: buildOrderedProductsList(),
+                    child: buildOrderedPetsList(),
                   ),
                 ],
               ),
@@ -66,18 +66,18 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> refreshPage() {
-    incomingOrdersProductsStream.reload();
+    incomingOrdersPetsStream.reload();
     return Future<void>.value();
   }
 
-  Widget buildOrderedProductsList() {
+  Widget buildOrderedPetsList() {
     return StreamBuilder<List<String>>(
-      stream: incomingOrdersProductsStream.stream,
+      stream: incomingOrdersPetsStream.stream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           print(snapshot.data);
-          final orderedProductsPaths = snapshot.data;
-          if (orderedProductsPaths.length == 0) {
+          final orderedPetsPaths = snapshot.data;
+          if (orderedPetsPaths.length == 0) {
             return Center(
               child: NothingToShowContainer(
                 iconPath: "assets/icons/empty_bag.svg",
@@ -87,14 +87,14 @@ class _BodyState extends State<Body> {
           }
           return ListView.builder(
             physics: BouncingScrollPhysics(),
-            itemCount: orderedProductsPaths.length,
+            itemCount: orderedPetsPaths.length,
             itemBuilder: (context, index) {
-              return FutureBuilder<OrderedProduct>(
-                future: UserDatabaseHelper().getOrderedProductFromPath(orderedProductsPaths[index]),
+              return FutureBuilder<OrderedPet>(
+                future: UserDatabaseHelper().getOrderedPetFromPath(orderedPetsPaths[index]),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    final orderedProduct = snapshot.data;
-                    return buildOrderedProductItem(orderedProduct, orderedProductsPaths[index]);
+                    final orderedPet = snapshot.data;
+                    return buildOrderedPetItem(orderedPet, orderedPetsPaths[index]);
                   } else if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -129,12 +129,12 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget buildOrderedProductItem(OrderedProduct orderedProduct, String docPath) {
-    return FutureBuilder<Product>(
-      future: ProductDatabaseHelper().getProductWithID(orderedProduct.productUid),
+  Widget buildOrderedPetItem(OrderedPet orderedPet, String docPath) {
+    return FutureBuilder<Pet>(
+      future: PetDatabaseHelper().getPetWithID(orderedPet.petUid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final product = snapshot.data;
+          final pet = snapshot.data;
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 6),
             child: Column(
@@ -164,7 +164,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.orderDate,
+                              text: orderedPet.orderDate,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -181,7 +181,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.subject,
+                              text: orderedPet.subject,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -198,7 +198,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.description,
+                              text: orderedPet.description,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -215,7 +215,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.dateTimeMeet,
+                              text: orderedPet.dateTimeMeet,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -232,7 +232,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.adoptionType.toString().replaceAll("AdoptionType.", ""),
+                              text: orderedPet.adoptionType.toString().replaceAll("AdoptionType.", ""),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -249,7 +249,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.status.toString().replaceAll("StatusType.", ""),
+                              text: orderedPet.status.toString().replaceAll("StatusType.", ""),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -272,14 +272,14 @@ class _BodyState extends State<Body> {
                       ),
                     ),
                   ),
-                  child: ProductShortDetailCard(
-                    productId: product.id,
+                  child: PetShortDetailCard(
+                    petId: pet.id,
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailsScreen(
-                            product: product,
+                          builder: (context) => PetDetailsScreen(
+                            pet: pet,
                           ),
                         ),
                       ).then((_) async {
@@ -288,7 +288,7 @@ class _BodyState extends State<Body> {
                     },
                   ),
                 ),
-                if (orderedProduct.status == StatusType.Ordered)
+                if (orderedPet.status == StatusType.Ordered)
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(

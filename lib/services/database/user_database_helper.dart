@@ -1,21 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app_flutter/models/Address.dart';
 import 'package:e_commerce_app_flutter/models/CartItem.dart';
-import 'package:e_commerce_app_flutter/models/OrderedProduct.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
+import 'package:e_commerce_app_flutter/models/OrderedPet.dart';
+import 'package:e_commerce_app_flutter/models/Pet.dart';
 import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
-import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
+import 'package:e_commerce_app_flutter/services/database/pet_database_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class UserDatabaseHelper {
   static const String USERS_COLLECTION_NAME = "users";
   static const String ADDRESSES_COLLECTION_NAME = "addresses";
   static const String CART_COLLECTION_NAME = "cart";
-  static const String ORDERED_PRODUCTS_COLLECTION_NAME = "ordered_products";
+  static const String ORDERED_PETS_COLLECTION_NAME = "ordered_pets";
 
   static const String PHONE_KEY = 'phone';
   static const String DP_KEY = "display_picture";
-  static const String FAV_PRODUCTS_KEY = "favourite_products";
+  static const String FAV_PETS_KEY = "favourite_pets";
   static const String FCM_TOKEN_KEY = "fcm_token";
   static const String INCOMING_ORDERS_KEY = "incoming_orders";
 
@@ -37,7 +37,7 @@ class UserDatabaseHelper {
     await firestore.collection(USERS_COLLECTION_NAME).doc(uid).set({
       DP_KEY: null,
       PHONE_KEY: null,
-      FAV_PRODUCTS_KEY: List<String>(),
+      FAV_PETS_KEY: List<String>(),
       FCM_TOKEN_KEY: await messaging.getToken(),
       INCOMING_ORDERS_KEY: List(),
     });
@@ -61,7 +61,7 @@ class UserDatabaseHelper {
     final docRef = firestore.collection(USERS_COLLECTION_NAME).doc(uid);
     final cartCollectionRef = docRef.collection(CART_COLLECTION_NAME);
     final addressCollectionRef = docRef.collection(ADDRESSES_COLLECTION_NAME);
-    final ordersCollectionRef = docRef.collection(ORDERED_PRODUCTS_COLLECTION_NAME);
+    final ordersCollectionRef = docRef.collection(ORDERED_PETS_COLLECTION_NAME);
 
     final cartDocs = await cartCollectionRef.get();
     for (final cartDoc in cartDocs.docs) {
@@ -79,46 +79,46 @@ class UserDatabaseHelper {
     await docRef.delete();
   }
 
-  Future<bool> isProductFavourite(String productId) async {
+  Future<bool> isPetFavourite(String petId) async {
     String uid = AuthentificationService().currentUser.uid;
     final userDocSnapshot = firestore.collection(USERS_COLLECTION_NAME).doc(uid);
     final userDocData = (await userDocSnapshot.get()).data();
-    final favList = userDocData[FAV_PRODUCTS_KEY].cast<String>();
-    if (favList.contains(productId)) {
+    final favList = userDocData[FAV_PETS_KEY].cast<String>();
+    if (favList.contains(petId)) {
       return true;
     } else {
       return false;
     }
   }
 
-  Future<List<Product>> get usersFavouriteProductsList async {
+  Future<List<Pet>> get usersFavouritePetsList async {
     String uid = AuthentificationService().currentUser.uid;
     final userDocSnapshot = firestore.collection(USERS_COLLECTION_NAME).doc(uid);
     final userDocData = (await userDocSnapshot.get()).data();
-    final favList = userDocData[FAV_PRODUCTS_KEY];
+    final favList = userDocData[FAV_PETS_KEY];
 
-    List products = List<Product>();
+    List pets = List<Pet>();
 
-    for (String productId in favList) {
-      final doc = await firestore.collection(ProductDatabaseHelper.PRODUCTS_COLLECTION_NAME).doc(productId).get();
-      Product product = Product.fromMap(doc.data(), id: doc.id);
-      products.add(product);
+    for (String petId in favList) {
+      final doc = await firestore.collection(PetDatabaseHelper.PETS_COLLECTION_NAME).doc(petId).get();
+      Pet pet = Pet.fromMap(doc.data(), id: doc.id);
+      pets.add(pet);
     }
 
-    return products;
+    return pets;
   }
 
-  Future<bool> switchProductFavouriteStatus(String productId, bool newState) async {
+  Future<bool> switchPetFavouriteStatus(String petId, bool newState) async {
     String uid = AuthentificationService().currentUser.uid;
     final userDocSnapshot = firestore.collection(USERS_COLLECTION_NAME).doc(uid);
 
     if (newState == true) {
       userDocSnapshot.update({
-        FAV_PRODUCTS_KEY: FieldValue.arrayUnion([productId])
+        FAV_PETS_KEY: FieldValue.arrayUnion([petId])
       });
     } else {
       userDocSnapshot.update({
-        FAV_PRODUCTS_KEY: FieldValue.arrayRemove([productId])
+        FAV_PETS_KEY: FieldValue.arrayRemove([petId])
       });
     }
     return true;
@@ -175,10 +175,10 @@ class UserDatabaseHelper {
     return cartItem;
   }
 
-  Future<bool> addProductToCart(String productId) async {
+  Future<bool> addPetToCart(String petId) async {
     String uid = AuthentificationService().currentUser.uid;
     final cartCollectionRef = firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(CART_COLLECTION_NAME);
-    final docRef = cartCollectionRef.doc(productId);
+    final docRef = cartCollectionRef.doc(petId);
     final docSnapshot = await docRef.get();
     bool alreadyPresent = docSnapshot.exists;
     if (alreadyPresent == false) {
@@ -192,15 +192,15 @@ class UserDatabaseHelper {
   Future<List<String>> emptyCart() async {
     String uid = AuthentificationService().currentUser.uid;
     final cartItems = await firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(CART_COLLECTION_NAME).get();
-    List orderedProductsUid = List<String>();
+    List orderedPetsUid = List<String>();
     for (final doc in cartItems.docs) {
-      orderedProductsUid.add(doc.id);
+      orderedPetsUid.add(doc.id);
       await doc.reference.delete();
     }
-    return orderedProductsUid;
+    return orderedPetsUid;
   }
 
-  Future<bool> removeProductFromCart(String cartItemID) async {
+  Future<bool> removePetFromCart(String cartItemID) async {
     String uid = AuthentificationService().currentUser.uid;
     final cartCollectionReference = firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(CART_COLLECTION_NAME);
     await cartCollectionReference.doc(cartItemID).delete();
@@ -222,7 +222,7 @@ class UserDatabaseHelper {
     final docSnapshot = await docRef.get();
     int currentCount = docSnapshot.data()[CartItem.ITEM_COUNT_KEY];
     if (currentCount <= 1) {
-      return removeProductFromCart(cartItemID);
+      return removePetFromCart(cartItemID);
     } else {
       docRef.update({CartItem.ITEM_COUNT_KEY: FieldValue.increment(-1)});
     }
@@ -239,46 +239,45 @@ class UserDatabaseHelper {
     return itemsId;
   }
 
-  Future<List<String>> get orderedProductsList async {
+  Future<List<String>> get orderedPetsList async {
     String uid = AuthentificationService().currentUser.uid;
-    final orderedProductsSnapshot =
-        await firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(ORDERED_PRODUCTS_COLLECTION_NAME).get();
-    List orderedProductsId = List<String>();
-    for (final doc in orderedProductsSnapshot.docs) {
-      orderedProductsId.add(doc.id);
+    final orderedPetsSnapshot =
+        await firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(ORDERED_PETS_COLLECTION_NAME).get();
+    List orderedPetsId = List<String>();
+    for (final doc in orderedPetsSnapshot.docs) {
+      orderedPetsId.add(doc.id);
     }
-    return orderedProductsId;
+    return orderedPetsId;
   }
 
-  Future<List<String>> get incomingOrdersProductsList async {
+  Future<List<String>> get incomingOrdersPetsList async {
     String uid = AuthentificationService().currentUser.uid;
-    final orderedProductsSnapshot = await firestore.collection(USERS_COLLECTION_NAME).doc(uid).get();
-    List orderedProductsId = List<String>.from(orderedProductsSnapshot.data()["incoming_orders"]);
-    return orderedProductsId;
+    final orderedPetsSnapshot = await firestore.collection(USERS_COLLECTION_NAME).doc(uid).get();
+    List orderedPetsId = List<String>.from(orderedPetsSnapshot.data()["incoming_orders"]);
+    return orderedPetsId;
   }
 
-  Future<bool> addToMyOrders(List<OrderedProduct> orders) async {
+  Future<bool> addToMyOrders(List<OrderedPet> orders) async {
     String uid = AuthentificationService().currentUser.uid;
-    final orderedProductsCollectionRef =
-        firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(ORDERED_PRODUCTS_COLLECTION_NAME);
+    final orderedPetsCollectionRef =
+        firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(ORDERED_PETS_COLLECTION_NAME);
     for (final order in orders) {
-      await orderedProductsCollectionRef.add(order.toMap());
+      await orderedPetsCollectionRef.add(order.toMap());
     }
     return true;
   }
 
-  Future<OrderedProduct> getOrderedProductFromId(String id) async {
+  Future<OrderedPet> getOrderedPetFromId(String id) async {
     String uid = AuthentificationService().currentUser.uid;
-    final doc =
-        await firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(ORDERED_PRODUCTS_COLLECTION_NAME).doc(id).get();
-    final orderedProduct = OrderedProduct.fromMap(doc.data(), id: doc.id);
-    return orderedProduct;
+    final doc = await firestore.collection(USERS_COLLECTION_NAME).doc(uid).collection(ORDERED_PETS_COLLECTION_NAME).doc(id).get();
+    final orderedPet = OrderedPet.fromMap(doc.data(), id: doc.id);
+    return orderedPet;
   }
 
-  Future<OrderedProduct> getOrderedProductFromPath(String path) async {
+  Future<OrderedPet> getOrderedPetFromPath(String path) async {
     final doc = await firestore.doc(path).get();
-    final orderedProduct = OrderedProduct.fromMap(doc.data(), id: doc.id);
-    return orderedProduct;
+    final orderedPet = OrderedPet.fromMap(doc.data(), id: doc.id);
+    return orderedPet;
   }
 
   Stream<DocumentSnapshot> get currentUserDataStream {

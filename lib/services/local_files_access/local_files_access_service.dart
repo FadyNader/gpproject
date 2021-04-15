@@ -11,8 +11,7 @@ Future<String> choseImageFromLocalFiles(
   int maxSizeInKB = 1024,
   int minSizeInKB = 5,
 }) async {
-  final PermissionStatus photoPermissionStatus =
-      await Permission.photos.request();
+  final PermissionStatus photoPermissionStatus = await Permission.photos.request();
   if (!photoPermissionStatus.isGranted) {
     throw LocalFileHandlingStorageReadPermissionDeniedException(
         message: "Permission required to read storage, please give permission");
@@ -41,18 +40,14 @@ Future<String> choseImageFromLocalFiles(
     },
     context: context,
   );
-  if (imgSource == null)
-    throw LocalImagePickingInvalidImageException(
-        message: "No image source selected");
+  if (imgSource == null) throw LocalImagePickingInvalidImageException(message: "No image source selected");
   final PickedFile imagePicked = await imgPicker.getImage(source: imgSource);
   if (imagePicked == null) {
     throw LocalImagePickingInvalidImageException();
   } else {
     final fileLength = await File(imagePicked.path).length();
-    if (fileLength > (maxSizeInKB * 1024) ||
-        fileLength < (minSizeInKB * 1024)) {
-      throw LocalImagePickingFileSizeOutOfBoundsException(
-          message: "Image size should not exceed 1MB");
+    if (fileLength > (maxSizeInKB * 1024) || fileLength < (minSizeInKB * 1024)) {
+      throw LocalImagePickingFileSizeOutOfBoundsException(message: "Image size should not exceed 1MB");
     } else {
       return imagePicked.path;
     }

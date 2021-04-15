@@ -45,6 +45,14 @@ dependencies:
   url_launcher: ^5.7.10
   tflite: any
   get: any
+  sqflite: any
+  # Calender date range
+  date_range_picker: any
+  # Local notifications
+  flutter_local_notifications: any
+  # Time zone
+  timezone: ^0.6.1
+  flutter_native_timezone: ^1.0.4
 
 
   # The following adds the Cupertino Icons font to your application.

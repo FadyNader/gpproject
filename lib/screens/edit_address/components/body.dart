@@ -16,8 +16,7 @@ class Body extends StatelessWidget {
       child: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenWidth(screenPadding)),
+          padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
           child: SizedBox(
             width: double.infinity,
             child: Column(
@@ -33,14 +32,12 @@ class Body extends StatelessWidget {
                         addressToEdit: null,
                       )
                     : FutureBuilder<Address>(
-                        future: UserDatabaseHelper()
-                            .getAddressFromId(addressIdToEdit),
+                        future: UserDatabaseHelper().getAddressFromId(addressIdToEdit),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             final address = snapshot.data;
                             return AddressDetailsForm(addressToEdit: address);
-                          } else if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
+                          } else if (snapshot.connectionState == ConnectionState.waiting) {
                             return Center(
                               child: CircularProgressIndicator(),
                             );

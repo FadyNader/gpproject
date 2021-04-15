@@ -18,11 +18,9 @@ class ChangeDisplayNameForm extends StatefulWidget {
 class _ChangeDisplayNameFormState extends State<ChangeDisplayNameForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController newDisplayNameController =
-      TextEditingController();
+  final TextEditingController newDisplayNameController = TextEditingController();
 
-  final TextEditingController currentDisplayNameController =
-      TextEditingController();
+  final TextEditingController currentDisplayNameController = TextEditingController();
 
   @override
   void dispose() {
@@ -55,8 +53,7 @@ class _ChangeDisplayNameFormState extends State<ChangeDisplayNameForm> {
                   );
                 },
               );
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Display Name updated")));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Display Name updated")));
             },
           ),
         ],
@@ -91,8 +88,7 @@ class _ChangeDisplayNameFormState extends State<ChangeDisplayNameForm> {
       stream: AuthentificationService().userChanges,
       builder: (context, snapshot) {
         String displayName;
-        if (snapshot.hasData && snapshot.data != null)
-          displayName = snapshot.data.displayName;
+        if (snapshot.hasData && snapshot.data != null) displayName = snapshot.data.displayName;
         final textField = TextFormField(
           controller: currentDisplayNameController,
           decoration: InputDecoration(
@@ -103,8 +99,7 @@ class _ChangeDisplayNameFormState extends State<ChangeDisplayNameForm> {
           ),
           readOnly: true,
         );
-        if (displayName != null)
-          currentDisplayNameController.text = displayName;
+        if (displayName != null) currentDisplayNameController.text = displayName;
         return textField;
       },
     );
@@ -113,8 +108,7 @@ class _ChangeDisplayNameFormState extends State<ChangeDisplayNameForm> {
   Future<void> changeDisplayNameButtonCallback() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      await AuthentificationService()
-          .updateCurrentUserDisplayName(newDisplayNameController.text);
+      await AuthentificationService().updateCurrentUserDisplayName(newDisplayNameController.text);
       print("Display Name updated to ${newDisplayNameController.text} ...");
     }
   }

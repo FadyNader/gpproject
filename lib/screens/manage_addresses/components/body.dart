@@ -39,8 +39,7 @@ class _BodyState extends State<Body> {
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(screenPadding)),
+            padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
             child: SizedBox(
               width: double.infinity,
               child: Column(
@@ -88,8 +87,7 @@ class _BodyState extends State<Body> {
                               itemBuilder: (context, index) {
                                 return buildAddressItemCard(addresses[index]);
                               });
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
+                        } else if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
                             child: CircularProgressIndicator(),
                           );
@@ -122,8 +120,7 @@ class _BodyState extends State<Body> {
     return Future<void>.value();
   }
 
-  Future<bool> deleteButtonCallback(
-      BuildContext context, String addressId) async {
+  Future<bool> deleteButtonCallback(BuildContext context, String addressId) async {
     final confirmDeletion = await showDialog(
       context: context,
       builder: (context) {
@@ -152,8 +149,7 @@ class _BodyState extends State<Body> {
       bool status = false;
       String snackbarMessage;
       try {
-        status =
-            await UserDatabaseHelper().deleteAddressForCurrentUser(addressId);
+        status = await UserDatabaseHelper().deleteAddressForCurrentUser(addressId);
         if (status == true) {
           snackbarMessage = "Address deleted successfully";
         } else {
@@ -179,13 +175,8 @@ class _BodyState extends State<Body> {
     return false;
   }
 
-  Future<bool> editButtonCallback(
-      BuildContext context, String addressId) async {
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                EditAddressScreen(addressIdToEdit: addressId)));
+  Future<bool> editButtonCallback(BuildContext context, String addressId) async {
+    await Navigator.push(context, MaterialPageRoute(builder: (context) => EditAddressScreen(addressIdToEdit: addressId)));
     await refreshPage();
     return false;
   }

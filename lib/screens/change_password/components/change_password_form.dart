@@ -16,11 +16,9 @@ class ChangePasswordForm extends StatefulWidget {
 
 class _ChangePasswordFormState extends State<ChangePasswordForm> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController currentPasswordController =
-      TextEditingController();
+  final TextEditingController currentPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmNewPasswordController =
-      TextEditingController();
+  final TextEditingController confirmNewPasswordController = TextEditingController();
 
   @override
   void dispose() {
@@ -35,8 +33,7 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
     return Form(
       key: _formKey,
       child: Padding(
-        padding: EdgeInsets.symmetric(
-            horizontal: getProportionateScreenWidth(screenPadding)),
+        padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
         child: Column(
           children: [
             buildCurrentPasswordFormField(),
@@ -135,22 +132,19 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       final AuthentificationService authService = AuthentificationService();
-      bool currentPasswordValidation = await authService
-          .verifyCurrentUserPassword(currentPasswordController.text);
+      bool currentPasswordValidation = await authService.verifyCurrentUserPassword(currentPasswordController.text);
       if (currentPasswordValidation == false) {
         print("Current password provided is wrong");
       } else {
         bool updationStatus = false;
         String snackbarMessage;
         try {
-          updationStatus = await authService.changePasswordForCurrentUser(
-              newPassword: newPasswordController.text);
+          updationStatus = await authService.changePasswordForCurrentUser(newPassword: newPasswordController.text);
           if (updationStatus == true) {
             snackbarMessage = "Password changed successfully";
           } else {
             throw FirebaseCredentialActionAuthUnknownReasonFailureException(
-                message:
-                    "Failed to change password, due to some unknown reason");
+                message: "Failed to change password, due to some unknown reason");
           }
         } on MessagedFirebaseAuthException catch (e) {
           snackbarMessage = e.message;

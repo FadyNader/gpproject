@@ -4,9 +4,9 @@ import 'package:e_commerce_app_flutter/services/database/user_database_helper.da
 class CartItemsStream extends DataStream<List<String>> {
   @override
   void reload() {
-    final allProductsFuture = UserDatabaseHelper().allCartItemsList;
-    allProductsFuture.then((favProducts) {
-      addData(favProducts);
+    final allPetsFuture = UserDatabaseHelper().allCartItemsList;
+    allPetsFuture.then((favPets) {
+      addData(favPets);
     }).catchError((e) {
       addError(e);
     });

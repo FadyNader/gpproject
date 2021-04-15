@@ -24,9 +24,8 @@ class SearchField extends StatelessWidget {
           focusedBorder: InputBorder.none,
           hintText: "Search a Pet",
           prefixIcon: Icon(Icons.search),
-          contentPadding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenWidth(20),
-              vertical: getProportionateScreenWidth(9)),
+          contentPadding:
+              EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(20), vertical: getProportionateScreenWidth(9)),
         ),
         onSubmitted: onSubmit,
       ),

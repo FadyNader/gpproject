@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app_flutter/components/default_button.dart';
 import 'package:e_commerce_app_flutter/components/nothingtoshow_container.dart';
-import 'package:e_commerce_app_flutter/components/product_short_detail_card.dart';
+import 'package:e_commerce_app_flutter/components/pet_short_detail_card.dart';
 import 'package:e_commerce_app_flutter/constants.dart';
 import 'package:e_commerce_app_flutter/models/CartItem.dart';
-import 'package:e_commerce_app_flutter/models/OrderedProduct.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
+import 'package:e_commerce_app_flutter/models/OrderedPet.dart';
+import 'package:e_commerce_app_flutter/models/Pet.dart';
 import 'package:e_commerce_app_flutter/screens/cart/components/checkout_card.dart';
-import 'package:e_commerce_app_flutter/screens/product_details/product_details_screen.dart';
+import 'package:e_commerce_app_flutter/screens/pet_details/pet_details_screen.dart';
 import 'package:e_commerce_app_flutter/services/data_streams/cart_items_stream.dart';
-import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
+import 'package:e_commerce_app_flutter/services/database/pet_database_helper.dart';
 import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:enum_to_string/enum_to_string.dart';
@@ -180,7 +180,7 @@ class _BodyState extends State<Body> {
           fontSize: 16,
         ),
         onChanged: (value) {
-          setState(()=>_adoptionType = value);
+          setState(() => _adoptionType = value);
         },
         elevation: 0,
         underline: SizedBox(width: 0, height: 0),
@@ -277,7 +277,7 @@ class _BodyState extends State<Body> {
               bool result = false;
               String snackbarMessage;
               try {
-                result = await UserDatabaseHelper().removeProductFromCart(cartItemId);
+                result = await UserDatabaseHelper().removePetFromCart(cartItemId);
                 if (result == true) {
                   snackbarMessage = "Pet removed from cart successfully";
                   await refreshPage();
@@ -321,25 +321,25 @@ class _BodyState extends State<Body> {
         border: Border.all(color: kTextColor.withOpacity(0.15)),
         borderRadius: BorderRadius.circular(15),
       ),
-      child: FutureBuilder<Product>(
-        future: ProductDatabaseHelper().getProductWithID(cartItemId),
+      child: FutureBuilder<Pet>(
+        future: PetDatabaseHelper().getPetWithID(cartItemId),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            Product product = snapshot.data;
+            Pet pet = snapshot.data;
             return Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   flex: 8,
-                  child: ProductShortDetailCard(
-                    productId: product.id,
+                  child: PetShortDetailCard(
+                    petId: pet.id,
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailsScreen(
-                            product: product,
+                          builder: (context) => PetDetailsScreen(
+                            pet: pet,
                           ),
                         ),
                       );
@@ -471,15 +471,15 @@ class _BodyState extends State<Body> {
       return;
     }
     final orderFuture = UserDatabaseHelper().emptyCart();
-    orderFuture.then((orderedProductsUid) async {
-      if (orderedProductsUid != null) {
-        print(orderedProductsUid);
+    orderFuture.then((orderedPetsUid) async {
+      if (orderedPetsUid != null) {
+        print(orderedPetsUid);
         final dateTime = DateTime.now();
         final formatedDateTime = "${dateTime.day}-${dateTime.month}-${dateTime.year}";
-        List<OrderedProduct> orderedProducts = orderedProductsUid
-            .map((e) => OrderedProduct(
+        List<OrderedPet> orderedPets = orderedPetsUid
+            .map((e) => OrderedPet(
                   null,
-                  productUid: e,
+                  petUid: e,
                   orderDate: formatedDateTime,
                   status: StatusType.Ordered,
                   subject: subjectFieldController.text.trim(),
@@ -488,11 +488,11 @@ class _BodyState extends State<Body> {
                   adoptionType: _adoptionType,
                 ))
             .toList();
-        bool addedProductsToMyProducts = false;
+        bool addedPetsToMyPets = false;
         String snackbarmMessage;
         try {
-          addedProductsToMyProducts = await UserDatabaseHelper().addToMyOrders(orderedProducts);
-          if (addedProductsToMyProducts) {
+          addedPetsToMyPets = await UserDatabaseHelper().addToMyOrders(orderedPets);
+          if (addedPetsToMyPets) {
             snackbarmMessage = "Pet ordered Successfully";
           } else {
             throw "Could not order pets due to unknown issue";

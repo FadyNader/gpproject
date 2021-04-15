@@ -21,8 +21,7 @@ class IconButtonWithCounter extends StatelessWidget {
       onTap: press,
       borderRadius: BorderRadius.circular(50),
       child: Stack(
-        clipBehavior:
-            Clip.none, // makes the stack clip over the overlapping widget
+        clipBehavior: Clip.none, // makes the stack clip over the overlapping widget
         children: [
           Container(
             padding: EdgeInsets.all(getProportionateScreenWidth(12)),

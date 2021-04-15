@@ -9,9 +9,7 @@ class AddressShortDetailsCard extends StatelessWidget {
   final String addressId;
   final Function onTap;
 
-  const AddressShortDetailsCard(
-      {Key key, @required this.addressId, @required this.onTap})
-      : super(key: key);
+  const AddressShortDetailsCard({Key key, @required this.addressId, @required this.onTap}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -30,8 +28,7 @@ class AddressShortDetailsCard extends StatelessWidget {
                     flex: 3,
                     child: Container(
                       height: double.infinity,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                       decoration: BoxDecoration(
                         color: kTextColor.withOpacity(0.24),
                         borderRadius: BorderRadius.only(

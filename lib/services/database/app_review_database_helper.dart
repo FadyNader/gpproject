@@ -6,8 +6,7 @@ class AppReviewDatabaseHelper {
   static const String APP_REVIEW_COLLECTION_NAME = "app_reviews";
 
   AppReviewDatabaseHelper._privateConstructor();
-  static AppReviewDatabaseHelper _instance =
-      AppReviewDatabaseHelper._privateConstructor();
+  static AppReviewDatabaseHelper _instance = AppReviewDatabaseHelper._privateConstructor();
   factory AppReviewDatabaseHelper() {
     return _instance;
   }

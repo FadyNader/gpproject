@@ -11,8 +11,7 @@ class Body extends StatelessWidget {
       child: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenWidth(screenPadding)),
+          padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
           child: Column(
             children: [
               SizedBox(height: SizeConfig.screenHeight * 0.04),

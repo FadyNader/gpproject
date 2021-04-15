@@ -34,8 +34,7 @@ class Body extends StatelessWidget {
                 SizedBox(height: getProportionateScreenHeight(50)),
                 InkWell(
                   onTap: () async {
-                    const String linkedInUrl =
-                        "https://www.linkedin.com/in/imrb7here";
+                    const String linkedInUrl = "https://www.linkedin.com/in/imrb7here";
                     await launchUrl(linkedInUrl);
                   },
                   child: buildDeveloperAvatar(),
@@ -80,19 +79,16 @@ class Body extends StatelessWidget {
                       iconSize: 40,
                       padding: EdgeInsets.all(16),
                       onPressed: () async {
-                        const String linkedInUrl =
-                            "https://www.linkedin.com/in/imrb7here";
+                        const String linkedInUrl = "https://www.linkedin.com/in/imrb7here";
                         await launchUrl(linkedInUrl);
                       },
                     ),
                     IconButton(
-                      icon: SvgPicture.asset("assets/icons/instagram_icon.svg",
-                          color: kTextColor.withOpacity(0.75)),
+                      icon: SvgPicture.asset("assets/icons/instagram_icon.svg", color: kTextColor.withOpacity(0.75)),
                       iconSize: 40,
                       padding: EdgeInsets.all(16),
                       onPressed: () async {
-                        const String instaUrl =
-                            "https://www.instagram.com/_rahul.badgujar_";
+                        const String instaUrl = "https://www.instagram.com/_rahul.badgujar_";
                         await launchUrl(instaUrl);
                       },
                     ),
@@ -174,8 +170,7 @@ class Body extends StatelessWidget {
     }
   }
 
-  Future<void> submitAppReview(BuildContext context,
-      {bool liked = true}) async {
+  Future<void> submitAppReview(BuildContext context, {bool liked = true}) async {
     AppReview prevReview;
     try {
       prevReview = await AppReviewDatabaseHelper().getAppReviewOfCurrentUser();

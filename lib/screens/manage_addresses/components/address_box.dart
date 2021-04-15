@@ -102,8 +102,7 @@ class AddressBox extends StatelessWidget {
                           ),
                         ],
                       );
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
+                    } else if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: CircularProgressIndicator(),
                       );

@@ -1,14 +1,14 @@
 import 'package:e_commerce_app_flutter/components/nothingtoshow_container.dart';
-import 'package:e_commerce_app_flutter/components/product_short_detail_card.dart';
+import 'package:e_commerce_app_flutter/components/pet_short_detail_card.dart';
 import 'package:e_commerce_app_flutter/constants.dart';
-import 'package:e_commerce_app_flutter/models/OrderedProduct.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
+import 'package:e_commerce_app_flutter/models/OrderedPet.dart';
+import 'package:e_commerce_app_flutter/models/Pet.dart';
 import 'package:e_commerce_app_flutter/models/Review.dart';
-import 'package:e_commerce_app_flutter/screens/my_orders/components/product_review_dialog.dart';
-import 'package:e_commerce_app_flutter/screens/product_details/product_details_screen.dart';
+import 'package:e_commerce_app_flutter/screens/my_orders/components/pet_review_dialog.dart';
+import 'package:e_commerce_app_flutter/screens/pet_details/pet_details_screen.dart';
 import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
-import 'package:e_commerce_app_flutter/services/data_streams/ordered_products_stream.dart';
-import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
+import 'package:e_commerce_app_flutter/services/data_streams/ordered_pets_stream.dart';
+import 'package:e_commerce_app_flutter/services/database/pet_database_helper.dart';
 import 'package:e_commerce_app_flutter/services/database/user_database_helper.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,18 +21,18 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  final OrderedProductsStream orderedProductsStream = OrderedProductsStream();
+  final OrderedPetsStream orderedPetsStream = OrderedPetsStream();
 
   @override
   void initState() {
     super.initState();
-    orderedProductsStream.init();
+    orderedPetsStream.init();
   }
 
   @override
   void dispose() {
     super.dispose();
-    orderedProductsStream.dispose();
+    orderedPetsStream.dispose();
   }
 
   @override
@@ -56,7 +56,7 @@ class _BodyState extends State<Body> {
                   SizedBox(height: getProportionateScreenHeight(20)),
                   SizedBox(
                     height: SizeConfig.screenHeight * 0.75,
-                    child: buildOrderedProductsList(),
+                    child: buildOrderedPetsList(),
                   ),
                 ],
               ),
@@ -68,17 +68,17 @@ class _BodyState extends State<Body> {
   }
 
   Future<void> refreshPage() {
-    orderedProductsStream.reload();
+    orderedPetsStream.reload();
     return Future<void>.value();
   }
 
-  Widget buildOrderedProductsList() {
+  Widget buildOrderedPetsList() {
     return StreamBuilder<List<String>>(
-      stream: orderedProductsStream.stream,
+      stream: orderedPetsStream.stream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final orderedProductsIds = snapshot.data;
-          if (orderedProductsIds.length == 0) {
+          final orderedPetsIds = snapshot.data;
+          if (orderedPetsIds.length == 0) {
             return Center(
               child: NothingToShowContainer(
                 iconPath: "assets/icons/empty_bag.svg",
@@ -88,14 +88,14 @@ class _BodyState extends State<Body> {
           }
           return ListView.builder(
             physics: BouncingScrollPhysics(),
-            itemCount: orderedProductsIds.length,
+            itemCount: orderedPetsIds.length,
             itemBuilder: (context, index) {
-              return FutureBuilder<OrderedProduct>(
-                future: UserDatabaseHelper().getOrderedProductFromId(orderedProductsIds[index]),
+              return FutureBuilder<OrderedPet>(
+                future: UserDatabaseHelper().getOrderedPetFromId(orderedPetsIds[index]),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    final orderedProduct = snapshot.data;
-                    return buildOrderedProductItem(orderedProduct);
+                    final orderedPet = snapshot.data;
+                    return buildOrderedPetItem(orderedPet);
                   } else if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
@@ -130,12 +130,12 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget buildOrderedProductItem(OrderedProduct orderedProduct) {
-    return FutureBuilder<Product>(
-      future: ProductDatabaseHelper().getProductWithID(orderedProduct.productUid),
+  Widget buildOrderedPetItem(OrderedPet orderedPet) {
+    return FutureBuilder<Pet>(
+      future: PetDatabaseHelper().getPetWithID(orderedPet.petUid),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          final product = snapshot.data;
+          final pet = snapshot.data;
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 6),
             child: Column(
@@ -165,7 +165,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.orderDate,
+                              text: orderedPet.orderDate,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -182,7 +182,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.subject,
+                              text: orderedPet.subject,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -199,7 +199,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.description,
+                              text: orderedPet.description,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -216,7 +216,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.dateTimeMeet,
+                              text: orderedPet.dateTimeMeet,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -233,7 +233,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.adoptionType.toString().replaceAll("AdoptionType.", ""),
+                              text: orderedPet.adoptionType.toString().replaceAll("AdoptionType.", ""),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -250,7 +250,7 @@ class _BodyState extends State<Body> {
                           ),
                           children: [
                             TextSpan(
-                              text: orderedProduct.status.toString().replaceAll("StatusType.", ""),
+                              text: orderedPet.status.toString().replaceAll("StatusType.", ""),
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -273,14 +273,14 @@ class _BodyState extends State<Body> {
                       ),
                     ),
                   ),
-                  child: ProductShortDetailCard(
-                    productId: product.id,
+                  child: PetShortDetailCard(
+                    petId: pet.id,
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProductDetailsScreen(
-                            product: product,
+                          builder: (context) => PetDetailsScreen(
+                            pet: pet,
                           ),
                         ),
                       ).then((_) async {
@@ -307,7 +307,7 @@ class _BodyState extends State<Body> {
                       String currentUserUid = AuthentificationService().currentUser.uid;
                       Review prevReview;
                       try {
-                        prevReview = await ProductDatabaseHelper().getProductReviewWithID(product.id, currentUserUid);
+                        prevReview = await PetDatabaseHelper().getPetReviewWithID(pet.id, currentUserUid);
                       } on FirebaseException catch (e) {
                         Logger().w("Firebase Exception: $e");
                       } catch (e) {
@@ -324,7 +324,7 @@ class _BodyState extends State<Body> {
                       final result = await showDialog(
                         context: context,
                         builder: (context) {
-                          return ProductReviewDialog(
+                          return PetReviewDialog(
                             review: prevReview,
                           );
                         },
@@ -333,11 +333,11 @@ class _BodyState extends State<Body> {
                         bool reviewAdded = false;
                         String snackbarMessage;
                         try {
-                          reviewAdded = await ProductDatabaseHelper().addProductReview(product.id, result);
+                          reviewAdded = await PetDatabaseHelper().addPetReview(pet.id, result);
                           if (reviewAdded == true) {
-                            snackbarMessage = "Product review added successfully";
+                            snackbarMessage = "Pet review added successfully";
                           } else {
-                            throw "Coulnd't add product review due to unknown reason";
+                            throw "Coulnd't add pet review due to unknown reason";
                           }
                         } on FirebaseException catch (e) {
                           Logger().w("Firebase Exception: $e");
@@ -357,7 +357,7 @@ class _BodyState extends State<Body> {
                       await refreshPage();
                     },
                     child: Text(
-                      "Give Product Review",
+                      "Give Pet Review",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,

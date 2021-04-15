@@ -18,10 +18,8 @@ class ChangePhoneNumberForm extends StatefulWidget {
 
 class _ChangePhoneNumberFormState extends State<ChangePhoneNumberForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController newPhoneNumberController =
-      TextEditingController();
-  final TextEditingController currentPhoneNumberController =
-      TextEditingController();
+  final TextEditingController newPhoneNumberController = TextEditingController();
+  final TextEditingController currentPhoneNumberController = TextEditingController();
 
   @override
   void dispose() {
@@ -70,8 +68,7 @@ class _ChangePhoneNumberFormState extends State<ChangePhoneNumberForm> {
       bool status = false;
       String snackbarMessage;
       try {
-        status = await UserDatabaseHelper()
-            .updatePhoneForCurrentUser(newPhoneNumberController.text);
+        status = await UserDatabaseHelper().updatePhoneForCurrentUser(newPhoneNumberController.text);
         if (status == true) {
           snackbarMessage = "Phone updated successfully";
         } else {
@@ -125,8 +122,7 @@ class _ChangePhoneNumberFormState extends State<ChangePhoneNumberForm> {
           Logger().w(error.toString());
         }
         String currentPhone;
-        if (snapshot.hasData && snapshot.data != null)
-          currentPhone = snapshot.data.data()[UserDatabaseHelper.PHONE_KEY];
+        if (snapshot.hasData && snapshot.data != null) currentPhone = snapshot.data.data()[UserDatabaseHelper.PHONE_KEY];
         final textField = TextFormField(
           controller: currentPhoneNumberController,
           decoration: InputDecoration(
@@ -137,8 +133,7 @@ class _ChangePhoneNumberFormState extends State<ChangePhoneNumberForm> {
           ),
           readOnly: true,
         );
-        if (currentPhone != null)
-          currentPhoneNumberController.text = currentPhone;
+        if (currentPhone != null) currentPhoneNumberController.text = currentPhone;
         return textField;
       },
     );

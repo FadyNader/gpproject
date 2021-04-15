@@ -23,8 +23,7 @@ class Body extends StatelessWidget {
         child: SingleChildScrollView(
           physics: BouncingScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(screenPadding)),
+            padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
             child: SizedBox(
               width: double.infinity,
               child: Consumer<ChosenImage>(
@@ -60,8 +59,7 @@ class Body extends StatelessWidget {
     );
   }
 
-  Widget buildDisplayPictureAvatar(
-      BuildContext context, ChosenImage bodyState) {
+  Widget buildDisplayPictureAvatar(BuildContext context, ChosenImage bodyState) {
     return StreamBuilder(
       stream: UserDatabaseHelper().currentUserDataStream,
       builder: (context, snapshot) {
@@ -128,8 +126,7 @@ class Body extends StatelessWidget {
     return DefaultButton(
       text: "Upload Picture",
       press: () {
-        final Future uploadFuture =
-            uploadImageToFirestorage(context, bodyState);
+        final Future uploadFuture = uploadImageToFirestorage(context, bodyState);
         showDialog(
           context: context,
           builder: (context) {
@@ -139,23 +136,19 @@ class Body extends StatelessWidget {
             );
           },
         );
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Display Picture updated")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Display Picture updated")));
       },
     );
   }
 
-  Future<void> uploadImageToFirestorage(
-      BuildContext context, ChosenImage bodyState) async {
+  Future<void> uploadImageToFirestorage(BuildContext context, ChosenImage bodyState) async {
     bool uploadDisplayPictureStatus = false;
     String snackbarMessage;
     try {
-      final downloadUrl = await FirestoreFilesAccess().uploadFileToPath(
-          bodyState.chosenImage,
-          UserDatabaseHelper().getPathForCurrentUserDisplayPicture());
+      final downloadUrl = await FirestoreFilesAccess()
+          .uploadFileToPath(bodyState.chosenImage, UserDatabaseHelper().getPathForCurrentUserDisplayPicture());
 
-      uploadDisplayPictureStatus = await UserDatabaseHelper()
-          .uploadDisplayPictureForCurrentUser(downloadUrl);
+      uploadDisplayPictureStatus = await UserDatabaseHelper().uploadDisplayPictureForCurrentUser(downloadUrl);
       if (uploadDisplayPictureStatus == true) {
         snackbarMessage = "Display Picture updated successfully";
       } else {
@@ -181,8 +174,7 @@ class Body extends StatelessWidget {
     return DefaultButton(
       text: "Remove Picture",
       press: () async {
-        final Future uploadFuture =
-            removeImageFromFirestore(context, bodyState);
+        final Future uploadFuture = removeImageFromFirestore(context, bodyState);
         await showDialog(
           context: context,
           builder: (context) {
@@ -192,22 +184,19 @@ class Body extends StatelessWidget {
             );
           },
         );
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Display Picture removed")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Display Picture removed")));
         Navigator.pop(context);
       },
     );
   }
 
-  Future<void> removeImageFromFirestore(
-      BuildContext context, ChosenImage bodyState) async {
+  Future<void> removeImageFromFirestore(BuildContext context, ChosenImage bodyState) async {
     bool status = false;
     String snackbarMessage;
     try {
       bool fileDeletedFromFirestore = false;
-      fileDeletedFromFirestore = await FirestoreFilesAccess()
-          .deleteFileFromPath(
-              UserDatabaseHelper().getPathForCurrentUserDisplayPicture());
+      fileDeletedFromFirestore =
+          await FirestoreFilesAccess().deleteFileFromPath(UserDatabaseHelper().getPathForCurrentUserDisplayPicture());
       if (fileDeletedFromFirestore == false) {
         throw "Couldn't delete file from Storage, please retry";
       }

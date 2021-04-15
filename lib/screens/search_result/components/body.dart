@@ -1,20 +1,20 @@
 import 'package:e_commerce_app_flutter/components/nothingtoshow_container.dart';
-import 'package:e_commerce_app_flutter/components/product_card.dart';
+import 'package:e_commerce_app_flutter/components/pet_card.dart';
 import 'package:e_commerce_app_flutter/constants.dart';
-import 'package:e_commerce_app_flutter/models/Product.dart';
-import 'package:e_commerce_app_flutter/screens/product_details/product_details_screen.dart';
+import 'package:e_commerce_app_flutter/models/Pet.dart';
+import 'package:e_commerce_app_flutter/screens/pet_details/pet_details_screen.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:flutter/material.dart';
 
 class Body extends StatelessWidget {
   final String searchQuery;
-  final List<Product> searchResultProducts;
+  final List<Pet> searchResultPets;
   final String searchIn;
 
   const Body({
     Key key,
     @required this.searchQuery,
-    @required this.searchResultProducts,
+    @required this.searchResultPets,
     @required this.searchIn,
   }) : super(key: key);
 
@@ -62,7 +62,7 @@ class Body extends StatelessWidget {
                 SizedBox(height: getProportionateScreenHeight(30)),
                 SizedBox(
                   height: SizeConfig.screenHeight * 0.75,
-                  child: buildProductsGrid(),
+                  child: buildPetsGrid(),
                 ),
                 SizedBox(height: getProportionateScreenHeight(30)),
               ],
@@ -73,7 +73,7 @@ class Body extends StatelessWidget {
     );
   }
 
-  Widget buildProductsGrid() {
+  Widget buildPetsGrid() {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 8,
@@ -85,7 +85,7 @@ class Body extends StatelessWidget {
       ),
       child: Builder(
         builder: (context) {
-          if (searchResultProducts.length > 0) {
+          if (searchResultPets.length > 0) {
             return GridView.builder(
               shrinkWrap: true,
               physics: BouncingScrollPhysics(),
@@ -95,16 +95,16 @@ class Body extends StatelessWidget {
                 crossAxisSpacing: 4,
                 mainAxisSpacing: 4,
               ),
-              itemCount: searchResultProducts.length,
+              itemCount: searchResultPets.length,
               itemBuilder: (context, index) {
-                return ProductCard(
-                  productId: searchResultProducts[index].id,
+                return PetCard(
+                  petId: searchResultPets[index].id,
                   press: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProductDetailsScreen(
-                          product: searchResultProducts[index],
+                        builder: (context) => PetDetailsScreen(
+                          pet: searchResultPets[index],
                         ),
                       ),
                     );

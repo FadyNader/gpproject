@@ -26,11 +26,9 @@ class _AddressDetailsFormState extends State<AddressDetailsForm> {
 
   final TextEditingController receiverFieldController = TextEditingController();
 
-  final TextEditingController addressLine1FieldController =
-      TextEditingController();
+  final TextEditingController addressLine1FieldController = TextEditingController();
 
-  final TextEditingController addressLine2FieldController =
-      TextEditingController();
+  final TextEditingController addressLine2FieldController = TextEditingController();
 
   final TextEditingController cityFieldController = TextEditingController();
 
@@ -88,9 +86,7 @@ class _AddressDetailsFormState extends State<AddressDetailsForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           DefaultButton(
             text: "Save Address",
-            press: widget.addressToEdit == null
-                ? saveNewAddressButtonCallback
-                : saveEditedAddressButtonCallback,
+            press: widget.addressToEdit == null ? saveNewAddressButtonCallback : saveEditedAddressButtonCallback,
           ),
         ],
       ),
@@ -314,8 +310,7 @@ class _AddressDetailsFormState extends State<AddressDetailsForm> {
       bool status = false;
       String snackbarMessage;
       try {
-        status =
-            await UserDatabaseHelper().addAddressForCurrentUser(newAddress);
+        status = await UserDatabaseHelper().addAddressForCurrentUser(newAddress);
         if (status == true) {
           snackbarMessage = "Address saved successfully";
         } else {
@@ -341,14 +336,12 @@ class _AddressDetailsFormState extends State<AddressDetailsForm> {
   Future<void> saveEditedAddressButtonCallback() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      final Address newAddress =
-          generateAddressObject(id: widget.addressToEdit.id);
+      final Address newAddress = generateAddressObject(id: widget.addressToEdit.id);
 
       bool status = false;
       String snackbarMessage;
       try {
-        status =
-            await UserDatabaseHelper().updateAddressForCurrentUser(newAddress);
+        status = await UserDatabaseHelper().updateAddressForCurrentUser(newAddress);
         if (status == true) {
           snackbarMessage = "Address updated successfully";
         } else {

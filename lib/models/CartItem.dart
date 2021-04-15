@@ -1,7 +1,7 @@
 import 'package:e_commerce_app_flutter/models/Model.dart';
 
 class CartItem extends Model {
-  static const String PRODUCT_ID_KEY = "product_id";
+  static const String PET_ID_KEY = "pet_id";
   static const String ITEM_COUNT_KEY = "item_count";
 
   int itemCount;
