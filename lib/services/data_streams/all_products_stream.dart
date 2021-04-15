@@ -1,7 +1,8 @@
+import 'package:e_commerce_app_flutter/models/Product.dart';
 import 'package:e_commerce_app_flutter/services/data_streams/data_stream.dart';
 import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
 
-class AllProductsStream extends DataStream<List<String>> {
+class AllProductsStream extends DataStream<List<Product>> {
   @override
   void reload() {
     final allProductsFuture = ProductDatabaseHelper().allProductsList;

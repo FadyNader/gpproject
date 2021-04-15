@@ -1,5 +1,6 @@
 import 'package:e_commerce_app_flutter/models/Review.dart';
 import 'package:flutter/material.dart';
+
 import '../../../constants.dart';
 
 class ReviewBox extends StatelessWidget {
@@ -28,7 +29,7 @@ class ReviewBox extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              review.feedback,
+              "${review.feedback}",
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 14,

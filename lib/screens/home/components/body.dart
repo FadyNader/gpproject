@@ -12,6 +12,7 @@ import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:future_progress_dialog/future_progress_dialog.dart';
 import 'package:logger/logger.dart';
+
 import '../../../utils.dart';
 import '../components/home_header.dart';
 import 'product_type_box.dart';
@@ -60,8 +61,7 @@ class _BodyState extends State<Body> {
     },
   ];
 
-  final FavouriteProductsStream favouriteProductsStream =
-      FavouriteProductsStream();
+  final FavouriteProductsStream favouriteProductsStream = FavouriteProductsStream();
   final AllProductsStream allProductsStream = AllProductsStream();
 
   @override
@@ -86,8 +86,7 @@ class _BodyState extends State<Body> {
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(screenPadding)),
+            padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -97,17 +96,16 @@ class _BodyState extends State<Body> {
                   onSearchSubmitted: (value) async {
                     final query = value.toString();
                     if (query.length <= 0) return;
-                    List<String> searchedProductsId;
+                    List<Product> searchedProducts;
                     try {
-                      searchedProductsId = await ProductDatabaseHelper()
-                          .searchInProducts(query.toLowerCase());
-                      if (searchedProductsId != null) {
+                      searchedProducts = await ProductDatabaseHelper().searchInProducts(query.toLowerCase());
+                      if (searchedProducts != null) {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => SearchResultScreen(
                               searchQuery: query,
-                              searchResultProductsId: searchedProductsId,
+                              searchResultProducts: searchedProducts,
                               searchIn: "All Pets",
                             ),
                           ),
@@ -127,16 +125,13 @@ class _BodyState extends State<Body> {
                     }
                   },
                   onCartButtonPressed: () async {
-                    bool allowed =
-                        AuthentificationService().currentUserVerified;
+                    bool allowed = AuthentificationService().currentUserVerified;
                     if (!allowed) {
-                      final reverify = await showConfirmationDialog(context,
-                          "You haven't verified your email address. This action is only allowed for verified users.",
-                          positiveResponse: "Resend verification email",
-                          negativeResponse: "Go back");
+                      final reverify = await showConfirmationDialog(
+                          context, "You haven't verified your email address. This action is only allowed for verified users.",
+                          positiveResponse: "Resend verification email", negativeResponse: "Go back");
                       if (reverify) {
-                        final future = AuthentificationService()
-                            .sendVerificationEmailToCurrentUser();
+                        final future = AuthentificationService().sendVerificationEmailToCurrentUser();
                         await showDialog(
                           context: context,
                           builder: (context) {
@@ -177,10 +172,8 @@ class _BodyState extends State<Body> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        CategoryProductsScreen(
-                                      productType: productCategories[index]
-                                          [PRODUCT_TYPE_KEY],
+                                    builder: (context) => CategoryProductsScreen(
+                                      productType: productCategories[index][PRODUCT_TYPE_KEY],
                                     ),
                                   ),
                                 );
@@ -227,11 +220,11 @@ class _BodyState extends State<Body> {
     return Future<void>.value();
   }
 
-  void onProductCardTapped(String productId) {
+  void onProductCardTapped(Product product) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProductDetailsScreen(productId: productId),
+        builder: (context) => ProductDetailsScreen(product: product),
       ),
     ).then((_) async {
       await refreshPage();

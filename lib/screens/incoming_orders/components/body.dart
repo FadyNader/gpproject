@@ -279,7 +279,7 @@ class _BodyState extends State<Body> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ProductDetailsScreen(
-                            productId: product.id,
+                            product: product,
                           ),
                         ),
                       ).then((_) async {

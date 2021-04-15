@@ -44,6 +44,7 @@ dependencies:
   swipedetector: ^1.2.0
   url_launcher: ^5.7.10
   tflite: any
+  get: any
 
 
   # The following adds the Cupertino Icons font to your application.

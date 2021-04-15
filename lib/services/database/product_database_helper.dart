@@ -21,7 +21,7 @@ class ProductDatabaseHelper {
     return _firebaseFirestore;
   }
 
-  Future<List<String>> searchInProducts(String query, {ProductType productType}) async {
+  Future<List<Product>> searchInProducts(String query, {ProductType productType}) async {
     Query queryRef;
     if (productType == null) {
       queryRef = firestore.collection(PRODUCTS_COLLECTION_NAME);
@@ -31,10 +31,10 @@ class ProductDatabaseHelper {
       queryRef = firestore.collection(PRODUCTS_COLLECTION_NAME).where(Product.PRODUCT_TYPE_KEY, isEqualTo: productTypeStr);
     }
 
-    Set productsId = Set<String>();
+    Set products = Set<Product>();
     final querySearchInTags = await queryRef.where(Product.SEARCH_TAGS_KEY, arrayContains: query).get();
     for (final doc in querySearchInTags.docs) {
-      productsId.add(doc.id);
+      products.add(doc.id);
     }
     final queryRefDocs = await queryRef.get();
     for (final doc in queryRefDocs.docs) {
@@ -44,10 +44,10 @@ class ProductDatabaseHelper {
           product.highlights.toString().toLowerCase().contains(query) ||
           product.variant.toString().toLowerCase().contains(query) ||
           product.seller.toString().toLowerCase().contains(query)) {
-        productsId.add(product.id);
+        products.add(product);
       }
     }
-    return productsId.toList();
+    return products.toList();
   }
 
   Future<bool> addProductReview(String productId, Review review) async {
@@ -171,14 +171,14 @@ class ProductDatabaseHelper {
     return usersProducts;
   }
 
-  Future<List<String>> get allProductsList async {
-    final products = await firestore.collection(PRODUCTS_COLLECTION_NAME).get();
-    List productsId = List<String>();
-    for (final product in products.docs) {
-      final id = product.id;
-      productsId.add(id);
+  Future<List<Product>> get allProductsList async {
+    final productsDocs = await firestore.collection(PRODUCTS_COLLECTION_NAME).get();
+    List products = List<Product>();
+    for (final doc in productsDocs.docs) {
+      Product product = Product.fromMap(doc.data(), id: doc.id);
+      products.add(product);
     }
-    return productsId;
+    return products;
   }
 
   Future<bool> updateProductsImages(String productId, List<String> imgUrl) async {

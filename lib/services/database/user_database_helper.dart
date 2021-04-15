@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_commerce_app_flutter/models/Address.dart';
 import 'package:e_commerce_app_flutter/models/CartItem.dart';
 import 'package:e_commerce_app_flutter/models/OrderedProduct.dart';
+import 'package:e_commerce_app_flutter/models/Product.dart';
 import 'package:e_commerce_app_flutter/services/authentification/authentification_service.dart';
+import 'package:e_commerce_app_flutter/services/database/product_database_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 class UserDatabaseHelper {
@@ -89,12 +91,21 @@ class UserDatabaseHelper {
     }
   }
 
-  Future<List> get usersFavouriteProductsList async {
+  Future<List<Product>> get usersFavouriteProductsList async {
     String uid = AuthentificationService().currentUser.uid;
     final userDocSnapshot = firestore.collection(USERS_COLLECTION_NAME).doc(uid);
     final userDocData = (await userDocSnapshot.get()).data();
     final favList = userDocData[FAV_PRODUCTS_KEY];
-    return favList;
+
+    List products = List<Product>();
+
+    for (String productId in favList) {
+      final doc = await firestore.collection(ProductDatabaseHelper.PRODUCTS_COLLECTION_NAME).doc(productId).get();
+      Product product = Product.fromMap(doc.data(), id: doc.id);
+      products.add(product);
+    }
+
+    return products;
   }
 
   Future<bool> switchProductFavouriteStatus(String productId, bool newState) async {

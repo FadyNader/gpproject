@@ -23,8 +23,7 @@ class Body extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BodyState createState() =>
-      _BodyState(categoryProductsStream: CategoryProductsStream(productType));
+  _BodyState createState() => _BodyState(categoryProductsStream: CategoryProductsStream(productType));
 }
 
 class _BodyState extends State<Body> {
@@ -52,8 +51,7 @@ class _BodyState extends State<Body> {
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: getProportionateScreenWidth(screenPadding)),
+            padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
             child: SizedBox(
               width: double.infinity,
               child: Column(
@@ -68,23 +66,21 @@ class _BodyState extends State<Body> {
                   SizedBox(height: getProportionateScreenHeight(20)),
                   SizedBox(
                     height: SizeConfig.screenHeight * 0.68,
-                    child: StreamBuilder<List<String>>(
+                    child: StreamBuilder<List<Product>>(
                       stream: categoryProductsStream.stream,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          List<String> productsId = snapshot.data;
+                          List<Product> productsId = snapshot.data;
                           if (productsId.length == 0) {
                             return Center(
                               child: NothingToShowContainer(
-                                secondaryMessage:
-                                    "No Pets in ${EnumToString.convertToString(widget.productType)}",
+                                secondaryMessage: "No Pets in ${EnumToString.convertToString(widget.productType)}",
                               ),
                             );
                           }
 
                           return buildProductsGrid(productsId);
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
+                        } else if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(
                             child: CircularProgressIndicator(),
                           );
@@ -128,20 +124,18 @@ class _BodyState extends State<Body> {
             onSubmit: (value) async {
               final query = value.toString();
               if (query.length <= 0) return;
-              List<String> searchedProductsId;
+              List<Product> searchedProducts;
               try {
-                searchedProductsId = await ProductDatabaseHelper()
-                    .searchInProducts(query.toLowerCase(),
-                        productType: widget.productType);
-                if (searchedProductsId != null) {
+                searchedProducts =
+                    await ProductDatabaseHelper().searchInProducts(query.toLowerCase(), productType: widget.productType);
+                if (searchedProducts != null) {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => SearchResultScreen(
                         searchQuery: query,
-                        searchResultProductsId: searchedProductsId,
-                        searchIn:
-                            EnumToString.convertToString(widget.productType),
+                        searchResultProducts: searchedProducts,
+                        searchIn: EnumToString.convertToString(widget.productType),
                       ),
                     ),
                   );
@@ -204,7 +198,7 @@ class _BodyState extends State<Body> {
     );
   }
 
-  Widget buildProductsGrid(List<String> productsId) {
+  Widget buildProductsGrid(List<Product> products) {
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: 16,
@@ -216,17 +210,17 @@ class _BodyState extends State<Body> {
       ),
       child: GridView.builder(
         physics: BouncingScrollPhysics(),
-        itemCount: productsId.length,
+        itemCount: products.length,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           return ProductCard(
-            productId: productsId[index],
+            productId: products[index].id,
             press: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ProductDetailsScreen(
-                    productId: productsId[index],
+                    product: products[index],
                   ),
                 ),
               ).then(

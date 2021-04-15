@@ -1,3 +1,4 @@
+import 'package:e_commerce_app_flutter/models/Product.dart';
 import 'package:flutter/material.dart';
 
 import 'components/body.dart';
@@ -5,12 +6,12 @@ import 'components/body.dart';
 class SearchResultScreen extends StatelessWidget {
   final String searchQuery;
   final String searchIn;
-  final List<String> searchResultProductsId;
+  final List<Product> searchResultProducts;
 
   const SearchResultScreen({
     Key key,
     @required this.searchQuery,
-    @required this.searchResultProductsId,
+    @required this.searchResultProducts,
     @required this.searchIn,
   }) : super(key: key);
   @override
@@ -19,7 +20,7 @@ class SearchResultScreen extends StatelessWidget {
       appBar: AppBar(),
       body: Body(
         searchQuery: searchQuery,
-        searchResultProductsId: searchResultProductsId,
+        searchResultProducts: searchResultProducts,
         searchIn: searchIn,
       ),
     );

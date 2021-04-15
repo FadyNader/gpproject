@@ -1,5 +1,6 @@
 import 'package:e_commerce_app_flutter/components/nothingtoshow_container.dart';
 import 'package:e_commerce_app_flutter/components/product_card.dart';
+import 'package:e_commerce_app_flutter/models/Product.dart';
 import 'package:e_commerce_app_flutter/screens/home/components/section_tile.dart';
 import 'package:e_commerce_app_flutter/services/data_streams/data_stream.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,7 @@ class ProductsSection extends StatelessWidget {
   }
 
   Widget buildProductsList() {
-    return StreamBuilder<List<String>>(
+    return StreamBuilder<List<Product>>(
       stream: productsStreamController.stream,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -78,7 +79,7 @@ class ProductsSection extends StatelessWidget {
     );
   }
 
-  Widget buildProductGrid(List<String> productsId) {
+  Widget buildProductGrid(List<Product> products) {
     return GridView.builder(
       shrinkWrap: true,
       physics: BouncingScrollPhysics(),
@@ -88,12 +89,12 @@ class ProductsSection extends StatelessWidget {
         crossAxisSpacing: 4,
         mainAxisSpacing: 4,
       ),
-      itemCount: productsId.length,
-      itemBuilder: (context, index) {
+      itemCount: products.length,
+      itemBuilder: (_, index) {
         return ProductCard(
-          productId: productsId[index],
+          productId: products[index].id,
           press: () {
-            onProductCardTapped.call(productsId[index]);
+            onProductCardTapped.call(products[index]);
           },
         );
       },

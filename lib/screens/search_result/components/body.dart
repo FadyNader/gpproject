@@ -1,19 +1,20 @@
 import 'package:e_commerce_app_flutter/components/nothingtoshow_container.dart';
 import 'package:e_commerce_app_flutter/components/product_card.dart';
 import 'package:e_commerce_app_flutter/constants.dart';
+import 'package:e_commerce_app_flutter/models/Product.dart';
 import 'package:e_commerce_app_flutter/screens/product_details/product_details_screen.dart';
 import 'package:e_commerce_app_flutter/size_config.dart';
 import 'package:flutter/material.dart';
 
 class Body extends StatelessWidget {
   final String searchQuery;
-  final List<String> searchResultProductsId;
+  final List<Product> searchResultProducts;
   final String searchIn;
 
   const Body({
     Key key,
     @required this.searchQuery,
-    @required this.searchResultProductsId,
+    @required this.searchResultProducts,
     @required this.searchIn,
   }) : super(key: key);
 
@@ -22,8 +23,7 @@ class Body extends StatelessWidget {
     return SafeArea(
       child: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: getProportionateScreenWidth(screenPadding)),
+          padding: EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(screenPadding)),
           child: SizedBox(
             width: double.infinity,
             child: Column(
@@ -85,7 +85,7 @@ class Body extends StatelessWidget {
       ),
       child: Builder(
         builder: (context) {
-          if (searchResultProductsId.length > 0) {
+          if (searchResultProducts.length > 0) {
             return GridView.builder(
               shrinkWrap: true,
               physics: BouncingScrollPhysics(),
@@ -95,16 +95,16 @@ class Body extends StatelessWidget {
                 crossAxisSpacing: 4,
                 mainAxisSpacing: 4,
               ),
-              itemCount: searchResultProductsId.length,
+              itemCount: searchResultProducts.length,
               itemBuilder: (context, index) {
                 return ProductCard(
-                  productId: searchResultProductsId[index],
+                  productId: searchResultProducts[index].id,
                   press: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => ProductDetailsScreen(
-                          productId: searchResultProductsId[index],
+                          product: searchResultProducts[index],
                         ),
                       ),
                     );

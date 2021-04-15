@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'app.dart';
 
@@ -19,12 +20,75 @@ Future<void> _configFirebaseMessaging() async {
   _firebaseMessaging.configure(
     onMessage: (Map<String, dynamic> message) async {
       print("onMessage: $message");
+      String title = message["notification"].title;
+      String body = message["notification"].body;
+      String tag = message["data"]["tag"];
+      return showDialog(
+        context: Get.context,
+        builder: (context) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text("$title", textDirection: TextDirection.rtl, textAlign: TextAlign.center, style: TextStyle(fontSize: 24)),
+              SizedBox(height: 10),
+              Text("$body", textDirection: TextDirection.rtl, style: TextStyle(fontSize: 14, height: 1.5)),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[RaisedButton(child: Text("Done"), onPressed: () => Navigator.pop(context))],
+              ),
+            ],
+          ),
+        ),
+      );
     },
     onLaunch: (Map<String, dynamic> message) async {
       print("onLaunch: $message");
+      String title = message["notification"].title;
+      String body = message["notification"].body;
+      String tag = message["data"]["tag"];
+      return showDialog(
+        context: Get.context,
+        builder: (context) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text("$title", textDirection: TextDirection.rtl, textAlign: TextAlign.center, style: TextStyle(fontSize: 24)),
+              SizedBox(height: 10),
+              Text("$body", textDirection: TextDirection.rtl, style: TextStyle(fontSize: 14, height: 1.5)),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[RaisedButton(child: Text("Done"), onPressed: () => Navigator.pop(context))],
+              ),
+            ],
+          ),
+        ),
+      );
     },
     onResume: (Map<String, dynamic> message) async {
       print("onResume: $message");
+      String title = message["notification"].title;
+      String body = message["notification"].body;
+      String tag = message["data"]["tag"];
+      return showDialog(
+        context: Get.context,
+        builder: (context) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text("$title", textDirection: TextDirection.rtl, textAlign: TextAlign.center, style: TextStyle(fontSize: 24)),
+              SizedBox(height: 10),
+              Text("$body", textDirection: TextDirection.rtl, style: TextStyle(fontSize: 14, height: 1.5)),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[RaisedButton(child: Text("Done"), onPressed: () => Navigator.pop(context))],
+              ),
+            ],
+          ),
+        ),
+      );
     },
   );
 
